@@ -127,7 +127,7 @@ impairment) can still place and remove every material.
   somewhere sensible, not lost to `<body>`) and status changes are
   announced via an `aria-live` region.
 
-### [ ] 12. Design polish: responsive + brand review
+### [x] 12. Design polish: responsive + brand review
 A dedicated pass confirms the whole page — not just the chart — holds
 up at every breakpoint named in `docs/DESIGN.md`.
 
