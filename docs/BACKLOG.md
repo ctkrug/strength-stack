@@ -94,7 +94,7 @@ scaffold most often stays visually flat.
 
 ## Epic 3 — Juice, sound & accessibility
 
-### [ ] 9. Synth SFX with a persistent mute toggle
+### [x] 9. Synth SFX with a persistent mute toggle
 WebAudio-synthesized sound effects play for place/rescale/celebrate per
 the juice plan in `docs/DESIGN.md`, with a mute control.
 
