@@ -146,6 +146,20 @@ export class StrengthChart {
     this.plot.attr("transform", `translate(${margin.left},${margin.top})`);
     this.caption.attr("x", width - 4).attr("y", margin.top - 8);
 
+    const emptyMessage = this.plot
+      .selectAll<SVGTextElement, boolean>("text.strength-chart__empty")
+      .data(ranked.length === 0 ? [true] : []);
+    emptyMessage.exit().remove();
+    emptyMessage
+      .enter()
+      .append("text")
+      .attr("class", "strength-chart__empty")
+      .attr("text-anchor", "middle")
+      .text("Drag a material from the tray to add it to the chart.")
+      .merge(emptyMessage)
+      .attr("x", plotWidth / 2)
+      .attr("y", Math.max(height - margin.top - margin.bottom, 0) / 2);
+
     const maxValue = d3.max(ranked, specificStrength) ?? 1;
     const x = d3
       .scaleLinear()
