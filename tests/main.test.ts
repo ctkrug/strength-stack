@@ -429,7 +429,8 @@ describe("main", () => {
       '.tray__group[data-category="natural"]',
     )!;
     expect(
-      naturalGroup.querySelector(".tray__button")?.dataset.category,
+      naturalGroup.querySelector<HTMLButtonElement>(".tray__button")?.dataset
+        .category,
     ).toBe("natural");
   });
 
