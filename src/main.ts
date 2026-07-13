@@ -210,9 +210,17 @@ function main() {
   chart.render(store.getPlaced(), null);
   renderTray(store, chartPanel, tooltip);
 
-  window.addEventListener("resize", () =>
-    chart.render(store.getPlaced(), null),
-  );
+  // Coalesce rapid resize events (e.g. a drag-resize firing dozens of times
+  // a second) into one render so the 300ms rescale transition doesn't
+  // restart continuously.
+  let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+  window.addEventListener("resize", () => {
+    if (resizeTimer !== null) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resizeTimer = null;
+      chart.render(store.getPlaced(), null);
+    }, 100);
+  });
 }
 
 main();
