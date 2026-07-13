@@ -29,7 +29,7 @@ drag works on a phone-width viewport, not just mouse drag on desktop.
 - Dropping outside the chart panel is a no-op — the chip returns to the
   tray with no error and no partial placement.
 
-### [ ] 3. Remove a placed material from the chart
+### [x] 3. Remove a placed material from the chart
 A placed material can be taken back off the chart, returning it to the
 tray as available.
 
