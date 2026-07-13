@@ -5,7 +5,10 @@ import { Material } from "./materials";
  * `place()`, or null for removals — lets the chart tell a deliberate drop
  * apart from a re-sort so it only celebrates the former.
  */
-export type Listener = (placed: Material[], justPlacedId: string | null) => void;
+export type Listener = (
+  placed: Material[],
+  justPlacedId: string | null,
+) => void;
 
 /**
  * Tracks which materials are currently placed on the chart. Minimal

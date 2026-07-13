@@ -195,9 +195,13 @@ function main() {
 
       const name = getMaterial(justPlacedId)?.name ?? "Material";
       const rank = celebrated ? ", now ranked #1" : "";
-      announce(`${name} placed on the chart${rank}. ${placed.length} materials placed.`);
+      announce(
+        `${name} placed on the chart${rank}. ${placed.length} materials placed.`,
+      );
     } else {
-      announce(`Material removed from the chart. ${placed.length} materials placed.`);
+      announce(
+        `Material removed from the chart. ${placed.length} materials placed.`,
+      );
     }
   });
 

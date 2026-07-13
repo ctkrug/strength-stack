@@ -70,9 +70,9 @@ describe("main", () => {
 
     const celebrating = document.querySelector(".material-row--celebrate")!;
     expect(celebrating).not.toBeNull();
-    expect(
-      celebrating.querySelector(".material-row__label")?.textContent,
-    ).toBe("Snail Teeth");
+    expect(celebrating.querySelector(".material-row__label")?.textContent).toBe(
+      "Snail Teeth",
+    );
   });
 
   it("does not celebrate a material placed alongside a stronger one already on the chart", async () => {
@@ -367,16 +367,15 @@ describe("main", () => {
 
     expect(document.activeElement).not.toBe(document.body);
     expect(document.activeElement?.tagName).toBe("BUTTON");
-    expect((document.activeElement as HTMLButtonElement).disabled).toBe(
-      false,
-    );
+    expect((document.activeElement as HTMLButtonElement).disabled).toBe(false);
   });
 
   it("shows a chart bar's detail panel on hover and hides it on mouse-out", async () => {
     await import("../src/main");
 
     const boneRow = [...document.querySelectorAll(".material-row")].find(
-      (row) => row.querySelector(".material-row__label")?.textContent === "Bone",
+      (row) =>
+        row.querySelector(".material-row__label")?.textContent === "Bone",
     )!;
     boneRow.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
 
@@ -392,7 +391,8 @@ describe("main", () => {
     await import("../src/main");
 
     const boneRow = [...document.querySelectorAll(".material-row")].find(
-      (row) => row.querySelector(".material-row__label")?.textContent === "Bone",
+      (row) =>
+        row.querySelector(".material-row__label")?.textContent === "Bone",
     )!;
     boneRow.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
@@ -420,9 +420,9 @@ describe("main", () => {
   it("groups tray chips into category sections with headings", async () => {
     await import("../src/main");
 
-    const headings = [
-      ...document.querySelectorAll(".tray__group-heading"),
-    ].map((h) => h.textContent);
+    const headings = [...document.querySelectorAll(".tray__group-heading")].map(
+      (h) => h.textContent,
+    );
     expect(headings).toEqual(["Natural", "Metal", "Synthetic Fiber"]);
 
     const naturalGroup = document.querySelector(

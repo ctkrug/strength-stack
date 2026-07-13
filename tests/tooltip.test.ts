@@ -47,9 +47,9 @@ describe("MaterialTooltip", () => {
 
     tooltip.hide();
     expect(tooltip.isVisible()).toBe(false);
-    expect(document.querySelector(".material-tooltip")!.hasAttribute("hidden")).toBe(
-      true,
-    );
+    expect(
+      document.querySelector(".material-tooltip")!.hasAttribute("hidden"),
+    ).toBe(true);
   });
 
   it("does not throw when shown at the viewport edge", () => {
