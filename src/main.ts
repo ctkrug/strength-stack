@@ -1,6 +1,7 @@
 import { MATERIALS, getMaterial } from "./materials";
 import { ChartStore } from "./state";
 import { StrengthChart } from "./chart";
+import { enableDragToPlace } from "./drag";
 
 const DEFAULT_PLACED_IDS = ["concrete", "bone", "steel"];
 
@@ -22,7 +23,7 @@ function buildLayout(root: HTMLElement) {
   `;
 }
 
-function renderTray(store: ChartStore) {
+function renderTray(store: ChartStore, dropTarget: HTMLElement) {
   const list = document.getElementById("tray-list")!;
   list.innerHTML = "";
   for (const material of MATERIALS) {
@@ -38,6 +39,14 @@ function renderTray(store: ChartStore) {
     button.setAttribute("aria-pressed", String(placed));
     button.addEventListener("click", () => store.place(material));
 
+    if (!placed) {
+      enableDragToPlace({
+        source: button,
+        dropTarget,
+        onDrop: () => store.place(material),
+      });
+    }
+
     item.appendChild(button);
     list.appendChild(item);
   }
@@ -51,10 +60,11 @@ function main() {
 
   const store = new ChartStore();
   const chart = new StrengthChart(document.getElementById("chart")!);
+  const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
 
   store.subscribe((placed) => {
     chart.render(placed);
-    renderTray(store);
+    renderTray(store, chartPanel);
   });
 
   for (const id of DEFAULT_PLACED_IDS) {
