@@ -41,6 +41,25 @@ describe("SoundEngine", () => {
     expect(new SoundEngine().isMuted()).toBe(false);
   });
 
+  it("defaults to unmuted when localStorage access throws (private mode / sandboxed iframe)", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("blocked");
+    });
+
+    expect(() => new SoundEngine().isMuted()).not.toThrow();
+    expect(new SoundEngine().isMuted()).toBe(false);
+  });
+
+  it("keeps the in-memory mute state even when persisting it throws", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("blocked");
+    });
+
+    const engine = new SoundEngine();
+    expect(() => engine.setMuted(true)).not.toThrow();
+    expect(engine.isMuted()).toBe(true);
+  });
+
   it("persists mute state to localStorage across instances", () => {
     new SoundEngine().setMuted(true);
     expect(new SoundEngine().isMuted()).toBe(true);
