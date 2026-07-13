@@ -69,6 +69,13 @@ export function positionValueLabel(
   });
 }
 
+/** Shows/hides the hover/tap/focus detail panel for a material — implemented
+ * by `MaterialTooltip` in the real app, faked in tests. */
+export interface DetailPanel {
+  show(material: Material, x: number, y: number): void;
+  hide(): void;
+}
+
 /**
  * Renders the materials as a horizontal bar chart, ranked by specific
  * strength. Call render() again whenever the placed set changes — it
@@ -80,10 +87,16 @@ export class StrengthChart {
   private caption: d3.Selection<SVGTextElement, unknown, null, undefined>;
   private container: HTMLElement;
   private onRemove: (id: string) => void;
+  private detail: DetailPanel;
 
-  constructor(container: HTMLElement, onRemove: (id: string) => void) {
+  constructor(
+    container: HTMLElement,
+    onRemove: (id: string) => void,
+    detail: DetailPanel,
+  ) {
     this.container = container;
     this.onRemove = onRemove;
+    this.detail = detail;
     this.svg = d3
       .select(container)
       .append("svg")
@@ -145,7 +158,11 @@ export class StrengthChart {
 
     rows.exit().remove();
 
-    const entering = rows.enter().append("g").attr("class", "material-row");
+    const entering = rows
+      .enter()
+      .append("g")
+      .attr("class", "material-row")
+      .attr("tabindex", "0");
 
     entering.append("rect").attr("class", "material-row__bar");
     entering.append("text").attr("class", "material-row__label");
@@ -171,13 +188,40 @@ export class StrengthChart {
     remove
       .attr("aria-label", (d) => `Remove ${d.name} from the chart`)
       .attr("transform", `translate(${removeX},${barHeight / 2})`)
-      .on("click", (_event, d) => this.onRemove(d.id))
+      .on("click", (event: MouseEvent, d) => {
+        // Stops the click from also bubbling to the row's own detail-panel
+        // handler below, which would otherwise show a tooltip for a
+        // material that this same click just removed from the chart.
+        event.stopPropagation();
+        this.onRemove(d.id);
+      })
       .on("keydown", (event: KeyboardEvent, d) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
+          event.stopPropagation();
           this.onRemove(d.id);
         }
       });
+
+    // Hover (desktop), tap (touch — synthesized as a click), and keyboard
+    // focus all surface the same detail panel; mouse-out/blur dismiss it.
+    merged
+      .attr("aria-label", (d) => `${d.name}, press for material detail`)
+      .on("mouseenter", (event: MouseEvent, d) =>
+        this.detail.show(d, event.clientX, event.clientY),
+      )
+      .on("mousemove", (event: MouseEvent, d) =>
+        this.detail.show(d, event.clientX, event.clientY),
+      )
+      .on("mouseleave", () => this.detail.hide())
+      .on("focus", (event: FocusEvent, d) => {
+        const rect = (event.currentTarget as Element).getBoundingClientRect();
+        this.detail.show(d, rect.left, rect.top);
+      })
+      .on("blur", () => this.detail.hide())
+      .on("click", (event: MouseEvent, d) =>
+        this.detail.show(d, event.clientX, event.clientY),
+      );
 
     merged
       .transition()
