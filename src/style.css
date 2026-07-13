@@ -398,7 +398,11 @@ button {
   cursor: pointer;
 }
 
-.material-row__remove circle {
+.material-row__remove-hit {
+  fill: transparent;
+}
+
+.material-row__remove-circle {
   fill: var(--color-surface-2);
   stroke: var(--color-grid-line);
   stroke-width: 1;
@@ -418,7 +422,7 @@ button {
   transition: fill var(--transition-ui);
 }
 
-.material-row__remove:hover circle {
+.material-row__remove:hover .material-row__remove-circle {
   fill: var(--color-danger);
   stroke: var(--color-danger);
 }
@@ -427,7 +431,7 @@ button {
   fill: var(--color-text);
 }
 
-.material-row__remove:active circle {
+.material-row__remove:active .material-row__remove-circle {
   transform: scale(0.92);
 }
 
@@ -435,7 +439,7 @@ button {
   outline: none;
 }
 
-.material-row__remove:focus-visible circle {
+.material-row__remove:focus-visible .material-row__remove-circle {
   stroke: var(--color-accent);
   stroke-width: 2;
 }

@@ -192,7 +192,17 @@ export class StrengthChart {
       .attr("class", "material-row__remove")
       .attr("tabindex", "0")
       .attr("role", "button");
-    enteringRemove.append("circle").attr("r", 11);
+    // A larger transparent circle behind the visible one so the tap target
+    // meets the 44px minimum even though the drawn control is smaller —
+    // SVG only hit-tests painted geometry, not a group's bounding box.
+    enteringRemove
+      .append("circle")
+      .attr("class", "material-row__remove-hit")
+      .attr("r", 22);
+    enteringRemove
+      .append("circle")
+      .attr("class", "material-row__remove-circle")
+      .attr("r", 11);
     enteringRemove.append("text").attr("dy", "0.32em").text("×");
 
     const merged = entering.merge(rows);
