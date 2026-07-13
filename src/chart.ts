@@ -32,9 +32,7 @@ export class StrengthChart {
       (a, b) => specificStrength(b) - specificStrength(a),
     );
     const height =
-      MARGIN.top +
-      MARGIN.bottom +
-      ranked.length * (BAR_HEIGHT + BAR_GAP);
+      MARGIN.top + MARGIN.bottom + ranked.length * (BAR_HEIGHT + BAR_GAP);
     const plotWidth = Math.max(width - MARGIN.left - MARGIN.right, 100);
 
     this.svg
@@ -56,10 +54,7 @@ export class StrengthChart {
 
     rows.exit().remove();
 
-    const entering = rows
-      .enter()
-      .append("g")
-      .attr("class", "material-row");
+    const entering = rows.enter().append("g").attr("class", "material-row");
 
     entering.append("rect").attr("class", "material-row__bar");
     entering.append("text").attr("class", "material-row__label");
