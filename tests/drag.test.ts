@@ -114,4 +114,37 @@ describe("enableDragToPlace", () => {
     expect(onDrop).not.toHaveBeenCalled();
     expect(document.querySelector(".drag-ghost")).toBeNull();
   });
+
+  it("ignores movement from an unrelated pointer during a drag (multi-touch)", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5, { pointerId: 1 }));
+    window.dispatchEvent(
+      pointerEvent("pointermove", 20, 20, { pointerId: 1 }),
+    );
+    expect(source.classList.contains("is-dragging")).toBe(true);
+
+    // A second finger touches down elsewhere and moves — this must not
+    // relocate source's ghost, which tracks only pointerId 1.
+    window.dispatchEvent(
+      pointerEvent("pointermove", 500, 500, { pointerId: 2 }),
+    );
+
+    const ghost = document.querySelector<HTMLElement>(".drag-ghost")!;
+    expect(ghost.style.transform).toBe("translate(20px, 20px)");
+  });
+
+  it("does not drop a source when a different pointer is released inside the target", () => {
+    // Source's own drag never crosses the threshold — it should not be
+    // considered "dragging" at all, let alone dropped by another pointer.
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5, { pointerId: 1 }));
+
+    // A second, unrelated pointer drags and releases inside the target.
+    window.dispatchEvent(
+      pointerEvent("pointermove", 150, 150, { pointerId: 2 }),
+    );
+    window.dispatchEvent(
+      pointerEvent("pointerup", 150, 150, { pointerId: 2 }),
+    );
+
+    expect(onDrop).not.toHaveBeenCalled();
+  });
 });
