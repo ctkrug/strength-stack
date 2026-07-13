@@ -16,8 +16,8 @@ function computeMargin(width: number) {
  * than bleeding past the SVG's edge or relying on lengthAdjust glyph
  * compression (unreliable across renderers for large ratios). No-op where
  * getComputedTextLength isn't implemented (jsdom under test). */
-function fitLabelWidth(
-  selection: d3.Selection<SVGTextElement, Material, SVGGElement, unknown>,
+export function fitLabelWidth(
+  selection: d3.Selection<SVGTextElement, Material, d3.BaseType, unknown>,
   maxWidth: number,
 ) {
   selection.each(function (d) {
@@ -42,8 +42,8 @@ const VALUE_FALLBACK_WIDTH = 28;
  * places it just outside — so it never overlaps a short bar's empty tail
  * or a long bar's neighboring columns. Falls back to a fixed width estimate
  * where getComputedTextLength isn't implemented (jsdom under test). */
-function positionValueLabel(
-  selection: d3.Selection<SVGTextElement, Material, SVGGElement, unknown>,
+export function positionValueLabel(
+  selection: d3.Selection<SVGTextElement, Material, d3.BaseType, unknown>,
   x: d3.ScaleLinear<number, number>,
 ) {
   selection.each(function (d) {
