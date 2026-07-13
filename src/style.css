@@ -155,11 +155,23 @@ button {
   padding: var(--space-2) var(--space-3);
   text-align: left;
   font-size: 0.95rem;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
   transition:
     background-color var(--transition-ui),
     transform var(--transition-ui),
     box-shadow var(--transition-ui);
+}
+
+.tray__button.is-dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.drag-ghost {
+  opacity: 0.9;
+  box-shadow: var(--glow-accent);
+  cursor: grabbing;
 }
 
 .tray__button:hover:not(:disabled) {
