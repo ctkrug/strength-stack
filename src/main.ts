@@ -58,23 +58,28 @@ function main() {
 
   buildLayout(root);
 
-  const store = new ChartStore();
+  const initialPlaced = DEFAULT_PLACED_IDS.map(getMaterial).filter(
+    (m): m is NonNullable<typeof m> => m !== undefined,
+  );
+  const store = new ChartStore(initialPlaced);
   const chart = new StrengthChart(document.getElementById("chart")!, (id) =>
     store.remove(id),
   );
   const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
 
-  store.subscribe((placed) => {
-    chart.render(placed);
+  store.subscribe((placed, justPlacedId) => {
+    chart.render(placed, justPlacedId);
     renderTray(store, chartPanel);
   });
 
-  for (const id of DEFAULT_PLACED_IDS) {
-    const material = getMaterial(id);
-    if (material) store.place(material);
-  }
+  // Seeded directly (not via place()) so the initial demo set never
+  // triggers the just-placed celebration meant for a deliberate drop.
+  chart.render(store.getPlaced(), null);
+  renderTray(store, chartPanel);
 
-  window.addEventListener("resize", () => chart.render(store.getPlaced()));
+  window.addEventListener("resize", () =>
+    chart.render(store.getPlaced(), null),
+  );
 }
 
 main();
