@@ -37,6 +37,7 @@ export class ChartStore {
   }
 
   remove(id: string): void {
+    if (!this.isPlaced(id)) return;
     this.placed = this.placed.filter((m) => m.id !== id);
     this.notify(null);
   }
