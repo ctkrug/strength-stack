@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { Material, specificStrength } from "./materials";
+import { Material, rankByStrength, specificStrength } from "./materials";
 
 const MARGIN = { top: 24, right: 96, bottom: 32, left: 160 };
 const BAR_HEIGHT = 40;
@@ -28,9 +28,7 @@ export class StrengthChart {
 
   render(materials: Material[]): void {
     const width = this.container.clientWidth || 800;
-    const ranked = [...materials].sort(
-      (a, b) => specificStrength(b) - specificStrength(a),
-    );
+    const ranked = rankByStrength(materials);
     const height =
       MARGIN.top + MARGIN.bottom + ranked.length * (BAR_HEIGHT + BAR_GAP);
     const plotWidth = Math.max(width - MARGIN.left - MARGIN.right, 100);
