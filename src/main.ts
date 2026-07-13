@@ -59,7 +59,9 @@ function main() {
   buildLayout(root);
 
   const store = new ChartStore();
-  const chart = new StrengthChart(document.getElementById("chart")!);
+  const chart = new StrengthChart(document.getElementById("chart")!, (id) =>
+    store.remove(id),
+  );
   const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
 
   store.subscribe((placed) => {
