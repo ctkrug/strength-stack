@@ -327,4 +327,67 @@ describe("main", () => {
     expect(playRescale).not.toHaveBeenCalled();
     expect(playCelebrate).not.toHaveBeenCalled();
   });
+
+  it("announces a placement in the status live region", async () => {
+    await import("../src/main");
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    button.click();
+
+    const announcer = document.getElementById("status-announcer")!;
+    expect(announcer.textContent).toBe(
+      "Nylon placed on the chart. 4 materials placed.",
+    );
+  });
+
+  it("announces a removal in the status live region", async () => {
+    await import("../src/main");
+
+    const removeBone = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Bone from the chart"]',
+    )!;
+    removeBone.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    const announcer = document.getElementById("status-announcer")!;
+    expect(announcer.textContent).toBe(
+      "Material removed from the chart. 2 materials placed.",
+    );
+  });
+
+  it("moves focus to another tray chip after a keyboard placement disables it", async () => {
+    await import("../src/main");
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    button.focus();
+    button.click();
+
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement?.tagName).toBe("BUTTON");
+    expect((document.activeElement as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+  });
+
+  it("moves focus to the tray heading once every material is placed", async () => {
+    await import("../src/main");
+
+    let remaining = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].filter((b) => !b.disabled);
+
+    while (remaining.length > 0) {
+      const [next] = remaining;
+      next.focus();
+      next.click();
+      remaining = [
+        ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+      ].filter((b) => !b.disabled);
+    }
+
+    expect(document.activeElement?.id).toBe("tray-title");
+  });
 });
