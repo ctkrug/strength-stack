@@ -133,3 +133,13 @@ export function specificStrength(material: Material): number {
 export function getMaterial(id: string): Material | undefined {
   return MATERIALS.find((m) => m.id === id);
 }
+
+/**
+ * Ranks materials strictly descending by specific strength. Pulled out of
+ * the chart's D3 rendering so ranking correctness is testable without a DOM.
+ */
+export function rankByStrength(materials: Material[]): Material[] {
+  return [...materials].sort(
+    (a, b) => specificStrength(b) - specificStrength(a),
+  );
+}
