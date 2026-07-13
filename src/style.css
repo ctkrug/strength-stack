@@ -214,6 +214,56 @@ button {
   font-weight: 500;
 }
 
+.tray__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-grid-line);
+  font-size: 0.78rem;
+}
+
+.tray__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.tray__legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tray__legend-item[data-category="natural"] {
+  color: var(--color-success);
+}
+
+.tray__legend-item[data-category="metal"] {
+  color: var(--color-accent);
+}
+
+.tray__legend-item[data-category="synthetic-fiber"] {
+  color: var(--color-accent-support);
+}
+
+.tray__group + .tray__group {
+  margin-top: var(--space-4);
+}
+
+.tray__group-heading {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
 .tray__list {
   list-style: none;
   margin: 0;
@@ -229,6 +279,7 @@ button {
   background: var(--color-surface-2);
   color: var(--color-text);
   border: 1px solid var(--color-grid-line);
+  border-left: 3px solid transparent;
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
   text-align: left;
@@ -237,8 +288,21 @@ button {
   touch-action: none;
   transition:
     background-color var(--transition-ui),
+    border-color var(--transition-ui),
     transform var(--transition-ui),
     box-shadow var(--transition-ui);
+}
+
+.tray__button[data-category="natural"] {
+  border-left-color: var(--color-success);
+}
+
+.tray__button[data-category="metal"] {
+  border-left-color: var(--color-accent);
+}
+
+.tray__button[data-category="synthetic-fiber"] {
+  border-left-color: var(--color-accent-support);
 }
 
 .tray__button.is-dragging {
@@ -267,9 +331,13 @@ button {
 }
 
 .tray__button:disabled {
+  background: var(--color-surface-1);
   color: var(--color-text-muted);
+  border-color: var(--color-grid-line);
+  border-left-color: var(--color-grid-line);
   cursor: default;
-  opacity: 0.5;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 /* Chart */
