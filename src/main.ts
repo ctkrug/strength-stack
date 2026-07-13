@@ -1,4 +1,9 @@
-import { MATERIALS, getMaterial } from "./materials";
+import {
+  CATEGORY_ORDER,
+  MATERIALS,
+  categoryLabel,
+  getMaterial,
+} from "./materials";
 import { ChartStore } from "./state";
 import { StrengthChart } from "./chart";
 import { enableDragToPlace } from "./drag";
@@ -34,7 +39,15 @@ function buildLayout(root: HTMLElement) {
       </section>
       <aside class="tray" aria-label="Available materials">
         <h2 class="tray__title" id="tray-title" tabindex="-1">Materials</h2>
-        <ul class="tray__list" id="tray-list"></ul>
+        <div class="tray__legend" role="list" aria-label="Material categories">
+          ${CATEGORY_ORDER.map(
+            (category) => `
+            <span class="tray__legend-item" data-category="${category}" role="listitem">
+              <span class="tray__legend-dot" aria-hidden="true"></span>${categoryLabel(category)}
+            </span>`,
+          ).join("")}
+        </div>
+        <div class="tray__groups" id="tray-groups"></div>
       </aside>
     </main>
     <p id="status-announcer" class="sr-only" role="status" aria-live="polite"></p>
@@ -72,48 +85,69 @@ function renderTray(
   dropTarget: HTMLElement,
   tooltip: MaterialTooltip,
 ) {
-  const list = document.getElementById("tray-list")!;
-  const focusWasInTray = list.contains(document.activeElement);
-  list.innerHTML = "";
+  const groups = document.getElementById("tray-groups")!;
+  const focusWasInTray = groups.contains(document.activeElement);
+  groups.innerHTML = "";
 
   let firstEnabledButton: HTMLButtonElement | null = null;
 
-  for (const material of MATERIALS) {
-    const item = document.createElement("li");
-    item.className = "tray__item";
-    const placed = store.isPlaced(material.id);
+  for (const category of CATEGORY_ORDER) {
+    const materials = MATERIALS.filter((m) => m.category === category);
+    if (materials.length === 0) continue;
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "tray__button";
-    button.textContent = material.name;
-    button.disabled = placed;
-    button.setAttribute("aria-pressed", String(placed));
-    button.addEventListener("click", () => store.place(material));
-    button.addEventListener("mouseenter", (event) =>
-      tooltip.show(material, event.clientX, event.clientY),
-    );
-    button.addEventListener("mousemove", (event) =>
-      tooltip.show(material, event.clientX, event.clientY),
-    );
-    button.addEventListener("mouseleave", () => tooltip.hide());
-    button.addEventListener("focus", () => {
-      const rect = button.getBoundingClientRect();
-      tooltip.show(material, rect.right, rect.top);
-    });
-    button.addEventListener("blur", () => tooltip.hide());
+    const group = document.createElement("div");
+    group.className = "tray__group";
+    group.dataset.category = category;
 
-    if (!placed) {
-      enableDragToPlace({
-        source: button,
-        dropTarget,
-        onDrop: () => store.place(material),
+    const heading = document.createElement("h3");
+    heading.className = "tray__group-heading";
+    heading.textContent = categoryLabel(category);
+    group.appendChild(heading);
+
+    const list = document.createElement("ul");
+    list.className = "tray__list";
+
+    for (const material of materials) {
+      const item = document.createElement("li");
+      item.className = "tray__item";
+      const placed = store.isPlaced(material.id);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "tray__button";
+      button.dataset.category = material.category;
+      button.textContent = material.name;
+      button.disabled = placed;
+      button.setAttribute("aria-pressed", String(placed));
+      button.addEventListener("click", () => store.place(material));
+      button.addEventListener("mouseenter", (event) =>
+        tooltip.show(material, event.clientX, event.clientY),
+      );
+      button.addEventListener("mousemove", (event) =>
+        tooltip.show(material, event.clientX, event.clientY),
+      );
+      button.addEventListener("mouseleave", () => tooltip.hide());
+      button.addEventListener("focus", () => {
+        const rect = button.getBoundingClientRect();
+        tooltip.show(material, rect.right, rect.top);
       });
-      firstEnabledButton ??= button;
+      button.addEventListener("blur", () => tooltip.hide());
+
+      if (!placed) {
+        enableDragToPlace({
+          source: button,
+          dropTarget,
+          onDrop: () => store.place(material),
+        });
+        firstEnabledButton ??= button;
+      }
+
+      item.appendChild(button);
+      list.appendChild(item);
     }
 
-    item.appendChild(button);
-    list.appendChild(item);
+    group.appendChild(list);
+    groups.appendChild(group);
   }
 
   // The tray button that triggered this render (if any) was just disabled
