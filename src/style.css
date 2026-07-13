@@ -292,6 +292,19 @@ button {
 .material-row__value {
   fill: var(--color-text-muted);
   font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.material-row__value--inside {
+  fill: var(--color-bg);
+  font-weight: 600;
+}
+
+.strength-chart__caption {
+  fill: var(--color-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .material-row__remove {
