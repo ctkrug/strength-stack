@@ -28,9 +28,11 @@ export class StrengthChart {
     this.plot = this.svg.append("g").attr("class", "strength-chart__plot");
   }
 
-  render(materials: Material[]): void {
+  render(materials: Material[], justPlacedId: string | null = null): void {
     const width = this.container.clientWidth || 800;
     const ranked = rankByStrength(materials);
+    const celebrateId =
+      justPlacedId && ranked[0]?.id === justPlacedId ? justPlacedId : null;
     const height =
       MARGIN.top + MARGIN.bottom + ranked.length * (BAR_HEIGHT + BAR_GAP);
     const plotWidth = Math.max(width - MARGIN.left - MARGIN.right, 100);
@@ -59,6 +61,7 @@ export class StrengthChart {
     entering.append("rect").attr("class", "material-row__bar");
     entering.append("text").attr("class", "material-row__label");
     entering.append("text").attr("class", "material-row__value");
+    entering.classed("material-row--celebrate", (d) => d.id === celebrateId);
 
     const enteringRemove = entering
       .append("g")
