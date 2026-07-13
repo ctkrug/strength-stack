@@ -39,13 +39,20 @@ once you account for how heavy it is?" That's the single axis every material
 gets plotted on, so a lightweight fiber and a dense metal are finally
 comparable at a glance.
 
-## Planned features
+## Features
 
-- Drag-and-drop material chips onto a live, animated D3 chart
-- Specific-strength ranking that rescales and re-sorts as materials are added
+- Drag-and-drop material chips onto a live, animated D3 chart — mouse and
+  touch both work via a single Pointer Events implementation; tap or
+  keyboard (Tab + Enter/Space) work too, no drag required
+- Specific-strength ranking that rescales and re-sorts as materials are
+  added or removed, for the full 12-material dataset in any order
 - A curated dataset spanning natural and synthetic materials (steel, bone,
   spider silk, kevlar, carbon fiber, snail teeth, and more)
-- Celebratory feedback when a dragged material takes the top spot
+- Celebratory highlight and synth chime when a dragged material takes the
+  top spot, with a persistent mute toggle and full `prefers-reduced-motion`
+  support
+- Live-region announcements and managed focus so the whole interaction is
+  usable without a mouse
 - A static, shareable, mobile-friendly build — no backend required
 
 ## Stack
@@ -66,8 +73,11 @@ npm run build     # production build to dist/
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design
-and [`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+Core interaction is functionally complete: drag-and-drop placement/removal,
+the snail-teeth wow moment, and synth SFX all work end to end. See
+[`docs/VISION.md`](docs/VISION.md) for the full design,
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the code is
+organized, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's left.
 
 ## License
 
