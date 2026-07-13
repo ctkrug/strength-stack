@@ -32,11 +32,17 @@ function buildLayout(root: HTMLElement) {
         <div class="chart-panel__canvas" id="chart"></div>
       </section>
       <aside class="tray" aria-label="Available materials">
-        <h2 class="tray__title">Materials</h2>
+        <h2 class="tray__title" id="tray-title" tabindex="-1">Materials</h2>
         <ul class="tray__list" id="tray-list"></ul>
       </aside>
     </main>
+    <p id="status-announcer" class="sr-only" role="status" aria-live="polite"></p>
   `;
+}
+
+function announce(message: string) {
+  const announcer = document.getElementById("status-announcer");
+  if (announcer) announcer.textContent = message;
 }
 
 function initMuteButton(sound: SoundEngine) {
@@ -62,7 +68,11 @@ function initMuteButton(sound: SoundEngine) {
 
 function renderTray(store: ChartStore, dropTarget: HTMLElement) {
   const list = document.getElementById("tray-list")!;
+  const focusWasInTray = list.contains(document.activeElement);
   list.innerHTML = "";
+
+  let firstEnabledButton: HTMLButtonElement | null = null;
+
   for (const material of MATERIALS) {
     const item = document.createElement("li");
     item.className = "tray__item";
@@ -82,10 +92,22 @@ function renderTray(store: ChartStore, dropTarget: HTMLElement) {
         dropTarget,
         onDrop: () => store.place(material),
       });
+      firstEnabledButton ??= button;
     }
 
     item.appendChild(button);
     list.appendChild(item);
+  }
+
+  // The tray button that triggered this render (if any) was just disabled
+  // and dropped from the DOM, which knocks focus back to <body> — land it
+  // somewhere useful instead of losing it.
+  if (focusWasInTray && document.activeElement === document.body) {
+    if (firstEnabledButton) {
+      firstEnabledButton.focus();
+    } else {
+      document.getElementById("tray-title")?.focus();
+    }
   }
 }
 
@@ -115,6 +137,12 @@ function main() {
       sound.playPlace();
       sound.playRescale();
       if (celebrated) sound.playCelebrate();
+
+      const name = getMaterial(justPlacedId)?.name ?? "Material";
+      const rank = celebrated ? ", now ranked #1" : "";
+      announce(`${name} placed on the chart${rank}. ${placed.length} materials placed.`);
+    } else {
+      announce(`Material removed from the chart. ${placed.length} materials placed.`);
     }
   });
 
