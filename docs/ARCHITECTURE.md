@@ -39,12 +39,29 @@ data fetching — everything ships in one self-contained bundle.
   - The remove control on each row is a custom SVG group (circle + ×,
     not a native `<button>`) wired to both `click` and `keydown`
     (Enter/Space) so it's operable without a mouse.
+  - Each row also gets a transparent `rect.material-row__hit` spanning
+    its full width and band height, behind the bar/label/remove control.
+    SVG groups only receive pointer events over painted descendants, so
+    without it, hovering the empty gap next to a short bar would miss
+    the row's hover/tap/focus handlers entirely.
+  - `StrengthChart` takes a `DetailPanel` collaborator (`show`/`hide`) in
+    its constructor and wires mouseenter/mousemove/click/focus/blur on
+    each row to it — hover, tap (touch has no hover state, so tap
+    synthesizes a `click`), and keyboard focus all surface the same
+    detail panel.
 - **`drag.ts`** — `enableDragToPlace()`: one Pointer Events implementation
   for drag-to-place that covers mouse and touch identically. A press that
   moves less than the drag threshold is left alone so the tray button's
   own `click` handler still handles tap/keyboard placement; a real drag
   suppresses the trailing synthetic click so a successful drop doesn't
   double-place.
+- **`tooltip.ts`** — `MaterialTooltip`: one lazily-created DOM panel showing
+  a material's tensile strength, density, specific strength, and fact.
+  `show()` repopulates and repositions the same node (clamped to the
+  viewport) rather than building a new element per material; `hide()`
+  just toggles its `hidden` attribute. Implements `chart.ts`'s
+  `DetailPanel` interface, so `chart.test.ts`-style tests can fake it
+  without touching the DOM.
 - **`sound.ts`** — `SoundEngine`: WebAudio-synthesized SFX (place/
   rescale/celebrate — sine oscillators, no audio files) per
   `docs/DESIGN.md`'s juice plan. The `AudioContext` is created lazily on
@@ -52,10 +69,13 @@ data fetching — everything ships in one self-contained bundle.
   where WebAudio isn't available, and the mute flag persists to
   `localStorage`.
 - **`main.ts`** — wires everything together: builds the static layout
-  shell, renders the tray (one button per material, drag source +
-  click/keyboard target), subscribes the chart/tray/sound/live-region to
-  the store, and manages focus so a chip that disables itself on
-  placement doesn't drop focus to `<body>`.
+  shell, renders the tray grouped into one section per
+  `MaterialCategory` (natural/metal/synthetic-fiber, in `CATEGORY_ORDER`)
+  under a heading, plus a legend naming what each category's accent
+  means. Each chip is a drag source + click/keyboard placement target
+  and also wires hover/focus to the shared `MaterialTooltip`. Subscribes
+  the chart/tray/sound/live-region to the store, and manages focus so a
+  chip that disables itself on placement doesn't drop focus to `<body>`.
 - **`style.css`** — design tokens (colors, type, spacing, motion) from
   `docs/DESIGN.md` as CSS custom properties, plus all component styles.
   A `prefers-reduced-motion` override collapses CSS animation/transition
@@ -68,13 +88,17 @@ data fetching — everything ships in one self-contained bundle.
 user drag/click/keyboard → ChartStore.place()/remove()
                               → notify(placed, justPlacedId)
                                   → StrengthChart.render() (redraws bars, returns celebrated?)
-                                  → renderTray() (rebuilds tray buttons + focus handoff)
+                                  → renderTray() (rebuilds grouped tray chips + focus handoff)
                                   → SoundEngine.playPlace()/playRescale()/playCelebrate()
                                   → live-region announce()
+
+user hover/tap/focus (bar or chip) → MaterialTooltip.show()/hide()
 ```
 
 There's no other state layer — `ChartStore` is the single source of
 truth, and every render is a pure function of its current placed set.
+The tooltip is a side-channel: it reads a `Material` directly from the
+event, not from the store, so it never needs to trigger a re-render.
 
 ## Testing
 
@@ -87,12 +111,18 @@ truth, and every render is a pure function of its current placed set.
 - `tests/state.test.ts` — `ChartStore` notification payloads.
 - `tests/sound.test.ts` — `SoundEngine` with a fake `AudioContext`
   (mute persistence, throttling, no-WebAudio safety).
+- `tests/tooltip.test.ts` — `MaterialTooltip` show/hide, DOM node reuse,
+  visibility, and viewport-edge safety.
+- `tests/chart-detail.test.ts` — `StrengthChart`'s detail-panel wiring
+  against a fake `DetailPanel`: hover/tap/focus/blur per row, and that
+  clicking remove doesn't also bubble into the row's own handler.
 - `tests/main.test.ts` — end-to-end through the wired app (jsdom):
   drag-drop placement, remove control, the wow-moment celebration,
-  SFX triggers, mute toggle, and live-region/focus behavior. Uses fake
-  timers because jsdom doesn't implement `SVGTransformList`, which D3's
-  transform transitions need — freezing the clock keeps the animation
-  frame that would hit that gap from ever firing.
+  SFX triggers, mute toggle, live-region/focus behavior, the tooltip on
+  bars and tray chips, and the category-grouped tray with its legend.
+  Uses fake timers because jsdom doesn't implement `SVGTransformList`,
+  which D3's transform transitions need — freezing the clock keeps the
+  animation frame that would hit that gap from ever firing.
 
 Run everything: `npm test` (vitest, jsdom environment — see
 `vitest.config.ts`). Type-check: `npm run build` (`tsc -b && vite build`).
