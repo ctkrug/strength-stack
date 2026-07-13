@@ -417,6 +417,48 @@ describe("main", () => {
     expect(tooltip.hasAttribute("hidden")).toBe(true);
   });
 
+  it("groups tray chips into category sections with headings", async () => {
+    await import("../src/main");
+
+    const headings = [
+      ...document.querySelectorAll(".tray__group-heading"),
+    ].map((h) => h.textContent);
+    expect(headings).toEqual(["Natural", "Metal", "Synthetic Fiber"]);
+
+    const naturalGroup = document.querySelector(
+      '.tray__group[data-category="natural"]',
+    )!;
+    expect(
+      naturalGroup.querySelector(".tray__button")?.dataset.category,
+    ).toBe("natural");
+  });
+
+  it("renders a category legend with one entry per category", async () => {
+    await import("../src/main");
+
+    const legendItems = [
+      ...document.querySelectorAll(".tray__legend-item"),
+    ].map((item) => item.getAttribute("data-category"));
+    expect(legendItems).toEqual(["natural", "metal", "synthetic-fiber"]);
+  });
+
+  it("keeps tray chips grouped by category after a placement re-render", async () => {
+    await import("../src/main");
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    button.click();
+
+    const syntheticGroup = document.querySelector(
+      '.tray__group[data-category="synthetic-fiber"]',
+    )!;
+    const nylon = [...syntheticGroup.querySelectorAll(".tray__button")].find(
+      (b) => b.textContent === "Nylon",
+    ) as HTMLButtonElement;
+    expect(nylon.disabled).toBe(true);
+  });
+
   it("moves focus to the tray heading once every material is placed", async () => {
     await import("../src/main");
 
