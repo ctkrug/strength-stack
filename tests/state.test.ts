@@ -51,6 +51,17 @@ describe("ChartStore", () => {
     expect(store.getPlaced()).toEqual([steel]);
   });
 
+  it("is a no-op to remove a material that isn't placed", () => {
+    const store = new ChartStore([steel]);
+    const listener = vi.fn();
+    store.subscribe(listener);
+
+    store.remove("kevlar-49");
+
+    expect(listener).not.toHaveBeenCalled();
+    expect(store.getPlaced()).toEqual([steel]);
+  });
+
   it("stops notifying after unsubscribe", () => {
     const store = new ChartStore();
     const listener = vi.fn();
