@@ -35,7 +35,7 @@ function stubRect(el: HTMLElement, rect: Partial<DOMRect>) {
 describe("enableDragToPlace", () => {
   let source: HTMLButtonElement;
   let target: HTMLDivElement;
-  let onDrop: ReturnType<typeof vi.fn>;
+  let onDrop: ReturnType<typeof vi.fn<() => void>>;
 
   beforeEach(() => {
     document.body.innerHTML = "";
