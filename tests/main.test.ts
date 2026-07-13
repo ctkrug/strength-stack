@@ -372,6 +372,51 @@ describe("main", () => {
     );
   });
 
+  it("shows a chart bar's detail panel on hover and hides it on mouse-out", async () => {
+    await import("../src/main");
+
+    const boneRow = [...document.querySelectorAll(".material-row")].find(
+      (row) => row.querySelector(".material-row__label")?.textContent === "Bone",
+    )!;
+    boneRow.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+
+    const tooltip = document.querySelector(".material-tooltip")!;
+    expect(tooltip.hasAttribute("hidden")).toBe(false);
+    expect(tooltip.textContent).toContain("Bone");
+
+    boneRow.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+    expect(tooltip.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("shows a chart bar's detail panel on tap (click) for touch devices", async () => {
+    await import("../src/main");
+
+    const boneRow = [...document.querySelectorAll(".material-row")].find(
+      (row) => row.querySelector(".material-row__label")?.textContent === "Bone",
+    )!;
+    boneRow.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    const tooltip = document.querySelector(".material-tooltip")!;
+    expect(tooltip.hasAttribute("hidden")).toBe(false);
+    expect(tooltip.textContent).toContain("Bone");
+  });
+
+  it("shows a tray chip's detail panel on hover and hides it on mouse-out", async () => {
+    await import("../src/main");
+
+    const nylonButton = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    nylonButton.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+
+    const tooltip = document.querySelector(".material-tooltip")!;
+    expect(tooltip.hasAttribute("hidden")).toBe(false);
+    expect(tooltip.textContent).toContain("Nylon");
+
+    nylonButton.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+    expect(tooltip.hasAttribute("hidden")).toBe(true);
+  });
+
   it("moves focus to the tray heading once every material is placed", async () => {
     await import("../src/main");
 
