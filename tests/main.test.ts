@@ -460,6 +460,22 @@ describe("main", () => {
     expect(nylon.disabled).toBe(true);
   });
 
+  it("coalesces rapid resize events into a single re-render", async () => {
+    const { StrengthChart } = await import("../src/chart");
+    const renderSpy = vi.spyOn(StrengthChart.prototype, "render");
+
+    await import("../src/main");
+    renderSpy.mockClear();
+
+    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event("resize"));
+
+    expect(renderSpy).not.toHaveBeenCalled();
+    vi.runAllTimers();
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+  });
+
   it("moves focus to the tray heading once every material is placed", async () => {
     await import("../src/main");
 
