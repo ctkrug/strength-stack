@@ -79,6 +79,13 @@ the snail-teeth wow moment, and synth SFX all work end to end. See
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the code is
 organized, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's left.
 
+## CI gate
+
+Every push and pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
+`npm run lint`, `npm test`, and `npm run build`, in that order. A red run on
+`main` is a stop-the-line signal — fix forward before adding new work, don't
+build on top of a broken commit.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
