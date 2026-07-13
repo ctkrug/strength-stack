@@ -39,7 +39,7 @@ tray as available.
   remaining bars.
 - The removed material's tray chip becomes enabled/available again.
 
-### [ ] 4. Chart correctness across the full dataset in any order
+### [x] 4. Chart correctness across the full dataset in any order
 The chart must rank and rescale correctly no matter which materials are
 placed or in what order — the wow-moment path isn't the only path that
 has to work.
