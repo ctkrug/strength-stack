@@ -149,7 +149,7 @@ The production build is a self-contained static bundle ready for
 - `index.html` includes Open Graph / Twitter Card meta tags (title,
   description, at minimum) so shared links render a real preview.
 
-### [ ] 14. CI gate enforced on main
+### [x] 14. CI gate enforced on main
 The GitHub Actions workflow added in SCOPE is treated as a hard gate,
 not a soft signal.
 
