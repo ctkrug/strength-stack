@@ -107,7 +107,7 @@ the juice plan in `docs/DESIGN.md`, with a mute control.
   does not throw or log errors in an environment without WebAudio
   (e.g. the test runner).
 
-### [ ] 10. Respect prefers-reduced-motion
+### [x] 10. Respect prefers-reduced-motion
 Users with reduced-motion preferences still get full chart functionality
 without the decorative flourishes.
 
