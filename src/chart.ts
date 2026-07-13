@@ -28,7 +28,8 @@ export class StrengthChart {
     this.plot = this.svg.append("g").attr("class", "strength-chart__plot");
   }
 
-  render(materials: Material[], justPlacedId: string | null = null): void {
+  /** Returns true when this render celebrated a newly placed top-rank material. */
+  render(materials: Material[], justPlacedId: string | null = null): boolean {
     const width = this.container.clientWidth || 800;
     const ranked = rankByStrength(materials);
     const celebrateId =
@@ -118,5 +119,7 @@ export class StrengthChart {
       .attr("dy", "0.35em")
       .attr("x", (d) => x(specificStrength(d)) + 12)
       .text((d) => `${specificStrength(d).toFixed(0)} kN·m/kg`);
+
+    return celebrateId !== null;
   }
 }
