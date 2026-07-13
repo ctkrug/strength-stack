@@ -48,12 +48,15 @@ export function enableDragToPlace(options: DragToPlaceOptions): void {
   source.addEventListener("pointerdown", (downEvent: PointerEvent) => {
     if (downEvent.button !== undefined && downEvent.button !== 0) return;
 
+    const pointerId = downEvent.pointerId;
     const startX = downEvent.clientX;
     const startY = downEvent.clientY;
     let dragging = false;
     let ghost: HTMLElement | null = null;
 
     const onMove = (moveEvent: PointerEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
+
       const dx = moveEvent.clientX - startX;
       const dy = moveEvent.clientY - startY;
 
@@ -70,6 +73,8 @@ export function enableDragToPlace(options: DragToPlaceOptions): void {
     };
 
     const onUp = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
@@ -92,7 +97,9 @@ export function enableDragToPlace(options: DragToPlaceOptions): void {
       }
     };
 
-    const onCancel = () => {
+    const onCancel = (cancelEvent: PointerEvent) => {
+      if (cancelEvent.pointerId !== pointerId) return;
+
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
