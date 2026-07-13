@@ -72,17 +72,22 @@ export function enableDragToPlace(options: DragToPlaceOptions): void {
       }
     };
 
-    const onUp = (upEvent: PointerEvent) => {
-      if (upEvent.pointerId !== pointerId) return;
-
+    const detach = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
-
+      window.removeEventListener("blur", onBlur);
       source.classList.remove("is-dragging");
       if (ghost) ghost.remove();
+    };
 
-      if (dragging) {
+    const onUp = (upEvent: PointerEvent) => {
+      if (upEvent.pointerId !== pointerId) return;
+
+      const wasDragging = dragging;
+      detach();
+
+      if (wasDragging) {
         // A real drag occurred — suppress the trailing synthetic click so
         // a successful drop doesn't also fire the tap-to-place handler.
         source.addEventListener("click", suppressNextClick, {
@@ -99,17 +104,18 @@ export function enableDragToPlace(options: DragToPlaceOptions): void {
 
     const onCancel = (cancelEvent: PointerEvent) => {
       if (cancelEvent.pointerId !== pointerId) return;
-
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      window.removeEventListener("pointercancel", onCancel);
-      source.classList.remove("is-dragging");
-      if (ghost) ghost.remove();
+      detach();
     };
+
+    // The window can lose focus mid-drag without any pointer event firing
+    // at all (alt-tab, an OS permission dialog, opening devtools) — without
+    // this, the ghost and is-dragging class would be stuck indefinitely.
+    const onBlur = () => detach();
 
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onUp);
     window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("blur", onBlur);
   });
 }
 
