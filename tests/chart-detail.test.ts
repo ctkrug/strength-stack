@@ -77,4 +77,15 @@ describe("StrengthChart detail panel wiring", () => {
     expect(onRemove).toHaveBeenCalledWith("steel");
     expect(detail.show).not.toHaveBeenCalled();
   });
+
+  it("gives the remove control an invisible hit target at least 44px across", () => {
+    const chart = new StrengthChart(container, vi.fn(), fakeDetailPanel());
+    chart.render([getMaterial("steel")!], null);
+
+    const hit = container.querySelector<SVGCircleElement>(
+      "g.material-row__remove circle.material-row__remove-hit",
+    )!;
+    expect(hit).not.toBeNull();
+    expect(Number(hit.getAttribute("r"))).toBeGreaterThanOrEqual(22);
+  });
 });
