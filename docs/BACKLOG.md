@@ -52,7 +52,7 @@ has to work.
 - Unit test coverage exists for the ranking/sort logic independent of
   the DOM (extends `tests/materials.test.ts` or a new `tests/chart.test.ts`).
 
-### [ ] 5. Design polish: chart panel matches docs/DESIGN.md
+### [x] 5. Design polish: chart panel matches docs/DESIGN.md
 The chart panel is reviewed against the design brief, not just left as
 the SCOPE-phase placeholder styling.
 
