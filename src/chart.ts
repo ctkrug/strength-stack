@@ -164,6 +164,10 @@ export class StrengthChart {
       .attr("class", "material-row")
       .attr("tabindex", "0");
 
+    // A transparent full-row rect behind everything else, so hover/tap
+    // anywhere in the row's area (not just the painted bar/label pixels)
+    // reaches the detail-panel handlers wired on the row group below.
+    entering.append("rect").attr("class", "material-row__hit");
     entering.append("rect").attr("class", "material-row__bar");
     entering.append("text").attr("class", "material-row__label");
     entering.append("text").attr("class", "material-row__value");
@@ -227,6 +231,13 @@ export class StrengthChart {
       .transition()
       .duration(300)
       .attr("transform", (_d, i) => `translate(0,${i * rowBand})`);
+
+    merged
+      .select<SVGRectElement>("rect.material-row__hit")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", plotWidth + margin.right)
+      .attr("height", rowBand);
 
     merged
       .select<SVGRectElement>("rect.material-row__bar")
