@@ -5,7 +5,7 @@ unchecked; check them off as builds land.
 
 ## Epic 1 — Core drag-and-drop chart
 
-### [ ] 1. Wow moment: dragging snail teeth rescales the chart and celebrates
+### [x] 1. Wow moment: dragging snail teeth rescales the chart and celebrates
 The chart starts with steel, bone, and concrete placed. Dragging the
 "Snail Teeth" chip from the tray onto the chart animates the x-axis to
 the new max, re-sorts every bar, and highlights the snail-teeth bar.
