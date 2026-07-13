@@ -1,5 +1,7 @@
 # Strength Stack
 
+[![CI](https://github.com/ctkrug/strength-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/ctkrug/strength-stack/actions/workflows/ci.yml)
+
 **Drag materials onto a shared strength chart and watch it redraw live.**
 
 Spider silk. Snail teeth. Kevlar. Bone. Steel. Strength Stack puts real
