@@ -14,9 +14,11 @@ export class StrengthChart {
   private svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
   private plot: d3.Selection<SVGGElement, unknown, null, undefined>;
   private container: HTMLElement;
+  private onRemove: (id: string) => void;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, onRemove: (id: string) => void) {
     this.container = container;
+    this.onRemove = onRemove;
     this.svg = d3
       .select(container)
       .append("svg")
@@ -58,7 +60,30 @@ export class StrengthChart {
     entering.append("text").attr("class", "material-row__label");
     entering.append("text").attr("class", "material-row__value");
 
+    const enteringRemove = entering
+      .append("g")
+      .attr("class", "material-row__remove")
+      .attr("tabindex", "0")
+      .attr("role", "button");
+    enteringRemove.append("circle").attr("r", 11);
+    enteringRemove.append("text").attr("dy", "0.32em").text("×");
+
     const merged = entering.merge(rows);
+
+    const remove = merged.select<SVGGElement>("g.material-row__remove");
+    remove
+      .attr(
+        "aria-label",
+        (d) => `Remove ${d.name} from the chart`,
+      )
+      .attr("transform", `translate(${plotWidth + 32},${BAR_HEIGHT / 2})`)
+      .on("click", (_event, d) => this.onRemove(d.id))
+      .on("keydown", (event: KeyboardEvent, d) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          this.onRemove(d.id);
+        }
+      });
 
     merged
       .transition()
