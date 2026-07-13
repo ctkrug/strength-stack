@@ -117,7 +117,7 @@ without the decorative flourishes.
   decorative).
 - No console errors or layout breakage occur in either motion mode.
 
-### [ ] 11. Keyboard-accessible placement
+### [x] 11. Keyboard-accessible placement
 A visitor who can't drag (keyboard-only, screen reader, motor
 impairment) can still place and remove every material.
 
