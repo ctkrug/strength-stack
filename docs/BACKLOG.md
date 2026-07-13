@@ -18,7 +18,7 @@ the new max, re-sorts every bar, and highlights the snail-teeth bar.
 - The rescale/re-sort/highlight sequence completes in under 1.5s end to
   end and does not require a page reload or teardown of the SVG.
 
-### [ ] 2. Drag-and-drop placement for every material, mouse and touch
+### [x] 2. Drag-and-drop placement for every material, mouse and touch
 Any tray chip can be dragged onto the chart panel to place it; touch
 drag works on a phone-width viewport, not just mouse drag on desktop.
 
