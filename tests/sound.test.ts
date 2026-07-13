@@ -41,6 +41,17 @@ describe("SoundEngine", () => {
     expect(new SoundEngine().isMuted()).toBe(false);
   });
 
+  it("defaults to unmuted when the stored value is hand-edited garbage", () => {
+    localStorage.setItem("strength-stack:muted", "yes-please");
+    expect(new SoundEngine().isMuted()).toBe(false);
+
+    localStorage.setItem("strength-stack:muted", "1");
+    expect(new SoundEngine().isMuted()).toBe(false);
+
+    localStorage.setItem("strength-stack:muted", "");
+    expect(new SoundEngine().isMuted()).toBe(false);
+  });
+
   it("defaults to unmuted when localStorage access throws (private mode / sandboxed iframe)", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new DOMException("blocked");
