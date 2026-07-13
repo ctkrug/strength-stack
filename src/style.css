@@ -284,6 +284,11 @@ button {
   rx: 4;
 }
 
+.material-row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .material-row__label {
   fill: var(--color-text);
   font-size: 0.85rem;
@@ -389,6 +394,59 @@ button {
 
 .material-row--celebrate .material-row__label {
   animation: celebrate-label 650ms var(--ease-out) forwards;
+}
+
+/* Material detail tooltip */
+
+.material-tooltip {
+  position: fixed;
+  z-index: 20;
+  max-width: 260px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-grid-line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--glow-accent);
+  padding: var(--space-3);
+  pointer-events: none;
+}
+
+.material-tooltip[hidden] {
+  display: none;
+}
+
+.material-tooltip__name {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.material-tooltip__stats {
+  margin: 0 0 var(--space-2);
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: var(--space-3);
+  row-gap: var(--space-1);
+  font-size: 0.8rem;
+}
+
+.material-tooltip__stats dt {
+  color: var(--color-text-muted);
+}
+
+.material-tooltip__stats dd {
+  margin: 0;
+  text-align: right;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.material-tooltip__fact {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 @media (max-width: 768px) {
