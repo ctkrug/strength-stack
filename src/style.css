@@ -75,6 +75,10 @@ button {
 /* Header */
 
 .site-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
   padding: var(--space-4) var(--space-5) var(--space-3);
   border-bottom: 1px solid var(--color-grid-line);
 }
@@ -94,6 +98,68 @@ button {
   margin: var(--space-1) 0 0;
   color: var(--color-text-muted);
   font-size: 0.9rem;
+}
+
+.mute-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-grid-line);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-ui),
+    box-shadow var(--transition-ui),
+    transform var(--transition-ui);
+}
+
+.mute-toggle svg {
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: currentColor;
+}
+
+.mute-toggle path.mute-toggle__speaker {
+  stroke: none;
+}
+
+.mute-toggle path.mute-toggle__wave {
+  fill: none;
+}
+
+.mute-toggle path.mute-toggle__slash {
+  fill: none;
+  stroke: var(--color-danger);
+  display: none;
+}
+
+.mute-toggle.is-muted path.mute-toggle__wave {
+  display: none;
+}
+
+.mute-toggle.is-muted path.mute-toggle__slash {
+  display: block;
+}
+
+.mute-toggle:hover {
+  background: var(--color-surface-1);
+  box-shadow: var(--glow-accent);
+}
+
+.mute-toggle:active {
+  transform: scale(0.94);
+}
+
+.mute-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* Layout */
