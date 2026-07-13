@@ -1,9 +1,73 @@
 import * as d3 from "d3";
 import { Material, rankByStrength, specificStrength } from "./materials";
 
-const MARGIN = { top: 24, right: 96, bottom: 32, left: 160 };
-const BAR_HEIGHT = 40;
-const BAR_GAP = 16;
+const MARGIN_DEFAULT = { top: 24, right: 100, bottom: 32, left: 160 };
+const MARGIN_COMPACT = { top: 20, right: 56, bottom: 24, left: 84 };
+const COMPACT_BREAKPOINT_PX = 480;
+const MIN_ROW_BAND = 56;
+const MAX_BAR_HEIGHT = 72;
+const MIN_BAR_HEIGHT = 32;
+
+function computeMargin(width: number) {
+  return width < COMPACT_BREAKPOINT_PX ? MARGIN_COMPACT : MARGIN_DEFAULT;
+}
+
+/** Truncates a label with an ellipsis when it overflows its column, rather
+ * than bleeding past the SVG's edge or relying on lengthAdjust glyph
+ * compression (unreliable across renderers for large ratios). No-op where
+ * getComputedTextLength isn't implemented (jsdom under test). */
+function fitLabelWidth(
+  selection: d3.Selection<SVGTextElement, Material, SVGGElement, unknown>,
+  maxWidth: number,
+) {
+  selection.each(function (d) {
+    const node = this as SVGTextElement & {
+      getComputedTextLength?: () => number;
+    };
+    if (typeof node.getComputedTextLength !== "function") return;
+    if (node.getComputedTextLength() <= maxWidth) return;
+
+    let truncated = d.name;
+    while (truncated.length > 1 && node.getComputedTextLength() > maxWidth) {
+      truncated = truncated.slice(0, -1);
+      node.textContent = `${truncated}…`;
+    }
+  });
+}
+
+const VALUE_INSIDE_PADDING = 8;
+const VALUE_FALLBACK_WIDTH = 28;
+
+/** Right-aligns a value label inside its bar when there's room, otherwise
+ * places it just outside — so it never overlaps a short bar's empty tail
+ * or a long bar's neighboring columns. Falls back to a fixed width estimate
+ * where getComputedTextLength isn't implemented (jsdom under test). */
+function positionValueLabel(
+  selection: d3.Selection<SVGTextElement, Material, SVGGElement, unknown>,
+  x: d3.ScaleLinear<number, number>,
+) {
+  selection.each(function (d) {
+    const node = this as SVGTextElement & {
+      getComputedTextLength?: () => number;
+    };
+    const barWidth = x(specificStrength(d));
+    const textWidth =
+      typeof node.getComputedTextLength === "function"
+        ? node.getComputedTextLength()
+        : VALUE_FALLBACK_WIDTH;
+    const fitsInside = barWidth > textWidth + VALUE_INSIDE_PADDING * 2;
+    const selected = d3.select(node);
+    selected
+      .attr("text-anchor", fitsInside ? "end" : "start")
+      .attr(
+        "x",
+        fitsInside
+          ? barWidth - VALUE_INSIDE_PADDING
+          : barWidth + VALUE_INSIDE_PADDING,
+      )
+      .classed("material-row__value--inside", fitsInside);
+  });
+}
 
 /**
  * Renders the materials as a horizontal bar chart, ranked by specific
@@ -13,6 +77,7 @@ const BAR_GAP = 16;
 export class StrengthChart {
   private svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
   private plot: d3.Selection<SVGGElement, unknown, null, undefined>;
+  private caption: d3.Selection<SVGTextElement, unknown, null, undefined>;
   private container: HTMLElement;
   private onRemove: (id: string) => void;
 
@@ -26,6 +91,11 @@ export class StrengthChart {
       .attr("role", "img")
       .attr("aria-label", "Materials ranked by specific strength");
     this.plot = this.svg.append("g").attr("class", "strength-chart__plot");
+    this.caption = this.svg
+      .append("text")
+      .attr("class", "strength-chart__caption")
+      .attr("text-anchor", "end")
+      .text("Specific strength — kN·m/kg");
   }
 
   /** Returns true when this render celebrated a newly placed top-rank material. */
@@ -34,16 +104,34 @@ export class StrengthChart {
     const ranked = rankByStrength(materials);
     const celebrateId =
       justPlacedId && ranked[0]?.id === justPlacedId ? justPlacedId : null;
-    const height =
-      MARGIN.top + MARGIN.bottom + ranked.length * (BAR_HEIGHT + BAR_GAP);
-    const plotWidth = Math.max(width - MARGIN.left - MARGIN.right, 100);
+
+    const margin = computeMargin(width);
+    const plotWidth = Math.max(width - margin.left - margin.right, 100);
+
+    // Distribute available panel height across rows so a short placed set
+    // fills the panel instead of leaving a dead gap below the last bar;
+    // a long set falls back to a comfortable minimum band per row.
+    const availableHeight = this.container.clientHeight || 0;
+    const rowCount = Math.max(ranked.length, 1);
+    const availableBand = availableHeight
+      ? (availableHeight - margin.top - margin.bottom) / rowCount
+      : MIN_ROW_BAND;
+    const rowBand = Math.max(MIN_ROW_BAND, availableBand);
+    const barHeight = Math.min(
+      MAX_BAR_HEIGHT,
+      Math.max(MIN_BAR_HEIGHT, rowBand - 16),
+    );
+
+    const contentHeight = margin.top + margin.bottom + ranked.length * rowBand;
+    const height = Math.max(contentHeight, availableHeight, 200);
 
     this.svg
-      .attr("viewBox", `0 0 ${width} ${Math.max(height, 200)}`)
+      .attr("viewBox", `0 0 ${width} ${height}`)
       .attr("width", width)
-      .attr("height", Math.max(height, 200));
+      .attr("height", height);
 
-    this.plot.attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+    this.plot.attr("transform", `translate(${margin.left},${margin.top})`);
+    this.caption.attr("x", width - 4).attr("y", margin.top - 8);
 
     const maxValue = d3.max(ranked, specificStrength) ?? 1;
     const x = d3
@@ -74,13 +162,15 @@ export class StrengthChart {
 
     const merged = entering.merge(rows);
 
+    // The remove control sits in a fixed column past the plot area — a bar
+    // near the axis max (up to the domain's 1.1x headroom) can never reach
+    // into it, so it never collides regardless of bar length.
+    const removeX = plotWidth + margin.right - 28;
+
     const remove = merged.select<SVGGElement>("g.material-row__remove");
     remove
-      .attr(
-        "aria-label",
-        (d) => `Remove ${d.name} from the chart`,
-      )
-      .attr("transform", `translate(${plotWidth + 32},${BAR_HEIGHT / 2})`)
+      .attr("aria-label", (d) => `Remove ${d.name} from the chart`)
+      .attr("transform", `translate(${removeX},${barHeight / 2})`)
       .on("click", (_event, d) => this.onRemove(d.id))
       .on("keydown", (event: KeyboardEvent, d) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -92,33 +182,31 @@ export class StrengthChart {
     merged
       .transition()
       .duration(300)
-      .attr(
-        "transform",
-        (_d, i) => `translate(0,${i * (BAR_HEIGHT + BAR_GAP)})`,
-      );
+      .attr("transform", (_d, i) => `translate(0,${i * rowBand})`);
 
     merged
       .select<SVGRectElement>("rect.material-row__bar")
-      .attr("height", BAR_HEIGHT)
+      .attr("height", barHeight)
       .attr("x", 0)
       .transition()
       .duration(300)
       .attr("width", (d) => x(specificStrength(d)));
 
-    merged
+    const label = merged
       .select<SVGTextElement>("text.material-row__label")
       .attr("x", -12)
-      .attr("y", BAR_HEIGHT / 2)
+      .attr("y", barHeight / 2)
       .attr("dy", "0.35em")
       .attr("text-anchor", "end")
       .text((d) => d.name);
+    fitLabelWidth(label, margin.left - 20);
 
-    merged
+    const value = merged
       .select<SVGTextElement>("text.material-row__value")
-      .attr("y", BAR_HEIGHT / 2)
+      .attr("y", barHeight / 2)
       .attr("dy", "0.35em")
-      .attr("x", (d) => x(specificStrength(d)) + 12)
-      .text((d) => `${specificStrength(d).toFixed(0)} kN·m/kg`);
+      .text((d) => `${specificStrength(d).toFixed(0)}`);
+    positionValueLabel(value, x);
 
     return celebrateId !== null;
   }
