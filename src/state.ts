@@ -1,14 +1,23 @@
 import { Material } from "./materials";
 
-export type Listener = (placed: Material[]) => void;
+/**
+ * `justPlacedId` is the id of the material that triggered this update via
+ * `place()`, or null for removals — lets the chart tell a deliberate drop
+ * apart from a re-sort so it only celebrates the former.
+ */
+export type Listener = (placed: Material[], justPlacedId: string | null) => void;
 
 /**
  * Tracks which materials are currently placed on the chart. Minimal
  * pub/sub store — the chart re-renders whenever the placed set changes.
  */
 export class ChartStore {
-  private placed: Material[] = [];
+  private placed: Material[];
   private listeners: Set<Listener> = new Set();
+
+  constructor(initial: Material[] = []) {
+    this.placed = [...initial];
+  }
 
   getPlaced(): Material[] {
     return [...this.placed];
@@ -21,12 +30,12 @@ export class ChartStore {
   place(material: Material): void {
     if (this.isPlaced(material.id)) return;
     this.placed = [...this.placed, material];
-    this.notify();
+    this.notify(material.id);
   }
 
   remove(id: string): void {
     this.placed = this.placed.filter((m) => m.id !== id);
-    this.notify();
+    this.notify(null);
   }
 
   subscribe(listener: Listener): () => void {
@@ -34,7 +43,8 @@ export class ChartStore {
     return () => this.listeners.delete(listener);
   }
 
-  private notify(): void {
-    for (const listener of this.listeners) listener(this.getPlaced());
+  private notify(justPlacedId: string | null): void {
+    const placed = this.getPlaced();
+    for (const listener of this.listeners) listener(placed, justPlacedId);
   }
 }
