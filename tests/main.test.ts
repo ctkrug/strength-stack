@@ -97,4 +97,45 @@ describe("main", () => {
     expect(document.querySelectorAll(".material-row")).toHaveLength(3);
     expect(button.disabled).toBe(false);
   });
+
+  it("removes a placed material when its remove control is clicked", async () => {
+    await import("../src/main");
+
+    const removeBone = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Bone from the chart"]',
+    )!;
+    removeBone.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(2);
+    const boneButton = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Bone")!;
+    expect(boneButton.disabled).toBe(false);
+  });
+
+  it("removes a placed material via Enter on its remove control", async () => {
+    await import("../src/main");
+
+    const removeSteel = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Steel (hardened) from the chart"]',
+    )!;
+    removeSteel.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+    );
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(2);
+  });
+
+  it("ignores unrelated keys on the remove control", async () => {
+    await import("../src/main");
+
+    const removeSteel = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Steel (hardened) from the chart"]',
+    )!;
+    removeSteel.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+    );
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(3);
+  });
 });
