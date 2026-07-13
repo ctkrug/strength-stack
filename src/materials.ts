@@ -134,6 +134,43 @@ export function getMaterial(id: string): Material | undefined {
   return MATERIALS.find((m) => m.id === id);
 }
 
+/** Display order for category groupings (tray legend/sections). */
+export const CATEGORY_ORDER: MaterialCategory[] = [
+  "natural",
+  "metal",
+  "synthetic-fiber",
+];
+
+const CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  natural: "Natural",
+  metal: "Metal",
+  "synthetic-fiber": "Synthetic Fiber",
+};
+
+export function categoryLabel(category: MaterialCategory): string {
+  return CATEGORY_LABELS[category];
+}
+
+export interface MaterialDetail {
+  tensileStrength: string;
+  density: string;
+  specificStrength: string;
+  fact: string;
+}
+
+/**
+ * Formats the stats shown in the hover/tap detail panel. Pulled out of the
+ * DOM-facing tooltip so the formatting itself is testable in isolation.
+ */
+export function describeMaterial(material: Material): MaterialDetail {
+  return {
+    tensileStrength: `${material.tensileStrengthMPa.toLocaleString()} MPa`,
+    density: `${material.densityKgM3.toLocaleString()} kg/m³`,
+    specificStrength: `${specificStrength(material).toFixed(0)} kN·m/kg`,
+    fact: material.fact,
+  };
+}
+
 /**
  * Ranks materials strictly descending by specific strength. Pulled out of
  * the chart's D3 rendering so ranking correctness is testable without a DOM.
