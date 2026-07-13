@@ -347,6 +347,14 @@ button {
   font-family: var(--font-ui);
 }
 
+.material-row {
+  cursor: pointer;
+}
+
+.material-row__hit {
+  fill: transparent;
+}
+
 .material-row__bar {
   fill: var(--color-accent);
   rx: 4;
