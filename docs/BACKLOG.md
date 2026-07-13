@@ -63,7 +63,7 @@ the SCOPE-phase placeholder styling.
 
 ## Epic 2 — Materials data & detail
 
-### [ ] 6. Material detail on hover/tap
+### [x] 6. Material detail on hover/tap
 Hovering (desktop) or tapping (touch) a placed bar or tray chip surfaces
 its tensile strength, density, specific strength, and one-line fact.
 
@@ -72,7 +72,7 @@ its tensile strength, density, specific strength, and one-line fact.
 - Tapping a bar on a touch device shows the same detail without
   requiring a hover state that touch can't produce.
 
-### [ ] 7. Category-coded tray with legend
+### [x] 7. Category-coded tray with legend
 Tray chips are visually grouped by category (natural / metal /
 synthetic-fiber) so the dataset reads as organized, not a flat list.
 
@@ -82,7 +82,7 @@ synthetic-fiber) so the dataset reads as organized, not a flat list.
 - A legend or grouped headings identify what each treatment means
   without requiring a tooltip to decode.
 
-### [ ] 8. Design polish: tray chips and legend
+### [x] 8. Design polish: tray chips and legend
 Tray chips get the same craft pass as the chart panel — this is where a
 scaffold most often stays visually flat.
 
