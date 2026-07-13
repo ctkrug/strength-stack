@@ -18,6 +18,7 @@ function stubRect(el: Element, rect: Partial<DOMRect>) {
 describe("main", () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="app"></div>';
+    localStorage.clear();
     vi.resetModules();
     // jsdom doesn't implement SVGTransformList, which D3's transform
     // transitions rely on — freeze the clock so no animation frame ever
@@ -28,6 +29,7 @@ describe("main", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("renders the default demo materials on load", async () => {
@@ -206,5 +208,123 @@ describe("main", () => {
     );
 
     expect(document.querySelectorAll(".material-row")).toHaveLength(3);
+  });
+
+  it("renders the mute toggle unmuted by default", async () => {
+    await import("../src/main");
+
+    const muteButton = document.getElementById("mute-toggle")!;
+    expect(muteButton.getAttribute("aria-pressed")).toBe("false");
+    expect(muteButton.classList.contains("is-muted")).toBe(false);
+  });
+
+  it("toggles mute state, aria-pressed, and label on click", async () => {
+    await import("../src/main");
+
+    const muteButton = document.getElementById("mute-toggle")!;
+    muteButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(muteButton.getAttribute("aria-pressed")).toBe("true");
+    expect(muteButton.classList.contains("is-muted")).toBe(true);
+    expect(muteButton.getAttribute("aria-label")).toBe("Unmute sound effects");
+
+    muteButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(muteButton.getAttribute("aria-pressed")).toBe("false");
+    expect(muteButton.getAttribute("aria-label")).toBe("Mute sound effects");
+  });
+
+  it("reflects a previously persisted mute state on load", async () => {
+    localStorage.setItem("strength-stack:muted", "true");
+
+    await import("../src/main");
+
+    const muteButton = document.getElementById("mute-toggle")!;
+    expect(muteButton.getAttribute("aria-pressed")).toBe("true");
+    expect(muteButton.classList.contains("is-muted")).toBe(true);
+  });
+
+  it("plays place and rescale SFX when a material is placed", async () => {
+    const { SoundEngine } = await import("../src/sound");
+    const playPlace = vi.spyOn(SoundEngine.prototype, "playPlace");
+    const playRescale = vi.spyOn(SoundEngine.prototype, "playRescale");
+    const playCelebrate = vi.spyOn(SoundEngine.prototype, "playCelebrate");
+
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 0, top: 0, right: 900, bottom: 900 });
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 400, clientY: 400 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 400, clientY: 400 }),
+    );
+
+    expect(playPlace).toHaveBeenCalledTimes(1);
+    expect(playRescale).toHaveBeenCalledTimes(1);
+    expect(playCelebrate).not.toHaveBeenCalled();
+  });
+
+  it("also plays the celebrate SFX when the drop reaches rank 1", async () => {
+    const { SoundEngine } = await import("../src/sound");
+    const playCelebrate = vi.spyOn(SoundEngine.prototype, "playCelebrate");
+
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 0, top: 0, right: 900, bottom: 900 });
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Snail Teeth")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 400, clientY: 400 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 400, clientY: 400 }),
+    );
+
+    expect(playCelebrate).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not play any SFX for a removal or the initial demo set", async () => {
+    const { SoundEngine } = await import("../src/sound");
+    const playPlace = vi.spyOn(SoundEngine.prototype, "playPlace");
+    const playRescale = vi.spyOn(SoundEngine.prototype, "playRescale");
+    const playCelebrate = vi.spyOn(SoundEngine.prototype, "playCelebrate");
+
+    await import("../src/main");
+
+    const removeBone = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Bone from the chart"]',
+    )!;
+    removeBone.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(playPlace).not.toHaveBeenCalled();
+    expect(playRescale).not.toHaveBeenCalled();
+    expect(playCelebrate).not.toHaveBeenCalled();
   });
 });
