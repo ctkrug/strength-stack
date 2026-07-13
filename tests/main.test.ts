@@ -35,6 +35,75 @@ describe("main", () => {
     expect(document.querySelectorAll(".material-row")).toHaveLength(3);
   });
 
+  it("does not celebrate any material in the default demo set on load", async () => {
+    await import("../src/main");
+    expect(document.querySelector(".material-row--celebrate")).toBeNull();
+  });
+
+  it("celebrates snail teeth when dragged onto the default steel/bone/concrete chart", async () => {
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 0, top: 0, right: 900, bottom: 900 });
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Snail Teeth")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 400, clientY: 400 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 400, clientY: 400 }),
+    );
+
+    const celebrating = document.querySelector(".material-row--celebrate")!;
+    expect(celebrating).not.toBeNull();
+    expect(
+      celebrating.querySelector(".material-row__label")?.textContent,
+    ).toBe("Snail Teeth");
+  });
+
+  it("does not celebrate a material placed alongside a stronger one already on the chart", async () => {
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 0, top: 0, right: 900, bottom: 900 });
+
+    // Nylon's specific strength is well below steel's, so it can never
+    // land at rank 1 on top of the default set — no celebration expected.
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 400, clientY: 400 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 400, clientY: 400 }),
+    );
+
+    expect(document.querySelector(".material-row--celebrate")).toBeNull();
+  });
+
   it("places a material by dragging its tray chip onto the chart panel", async () => {
     await import("../src/main");
 
