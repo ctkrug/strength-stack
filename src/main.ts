@@ -3,6 +3,7 @@ import { ChartStore } from "./state";
 import { StrengthChart } from "./chart";
 import { enableDragToPlace } from "./drag";
 import { SoundEngine } from "./sound";
+import { MaterialTooltip } from "./tooltip";
 
 const DEFAULT_PLACED_IDS = ["concrete", "bone", "steel"];
 
@@ -66,7 +67,11 @@ function initMuteButton(sound: SoundEngine) {
   sync();
 }
 
-function renderTray(store: ChartStore, dropTarget: HTMLElement) {
+function renderTray(
+  store: ChartStore,
+  dropTarget: HTMLElement,
+  tooltip: MaterialTooltip,
+) {
   const list = document.getElementById("tray-list")!;
   const focusWasInTray = list.contains(document.activeElement);
   list.innerHTML = "";
@@ -85,6 +90,18 @@ function renderTray(store: ChartStore, dropTarget: HTMLElement) {
     button.disabled = placed;
     button.setAttribute("aria-pressed", String(placed));
     button.addEventListener("click", () => store.place(material));
+    button.addEventListener("mouseenter", (event) =>
+      tooltip.show(material, event.clientX, event.clientY),
+    );
+    button.addEventListener("mousemove", (event) =>
+      tooltip.show(material, event.clientX, event.clientY),
+    );
+    button.addEventListener("mouseleave", () => tooltip.hide());
+    button.addEventListener("focus", () => {
+      const rect = button.getBoundingClientRect();
+      tooltip.show(material, rect.right, rect.top);
+    });
+    button.addEventListener("blur", () => tooltip.hide());
 
     if (!placed) {
       enableDragToPlace({
@@ -120,18 +137,22 @@ function main() {
   const sound = new SoundEngine();
   initMuteButton(sound);
 
+  const tooltip = new MaterialTooltip();
+
   const initialPlaced = DEFAULT_PLACED_IDS.map(getMaterial).filter(
     (m): m is NonNullable<typeof m> => m !== undefined,
   );
   const store = new ChartStore(initialPlaced);
-  const chart = new StrengthChart(document.getElementById("chart")!, (id) =>
-    store.remove(id),
+  const chart = new StrengthChart(
+    document.getElementById("chart")!,
+    (id) => store.remove(id),
+    tooltip,
   );
   const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
 
   store.subscribe((placed, justPlacedId) => {
     const celebrated = chart.render(placed, justPlacedId);
-    renderTray(store, chartPanel);
+    renderTray(store, chartPanel, tooltip);
 
     if (justPlacedId) {
       sound.playPlace();
@@ -149,7 +170,7 @@ function main() {
   // Seeded directly (not via place()) so the initial demo set never
   // triggers the just-placed celebration meant for a deliberate drop.
   chart.render(store.getPlaced(), null);
-  renderTray(store, chartPanel);
+  renderTray(store, chartPanel, tooltip);
 
   window.addEventListener("resize", () =>
     chart.render(store.getPlaced(), null),
