@@ -132,6 +132,35 @@ describe("enableDragToPlace", () => {
     expect(ghost.style.transform).toBe("translate(20px, 20px)");
   });
 
+  it("suppresses the trailing synthetic click after a completed drag", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
+    window.dispatchEvent(pointerEvent("pointermove", 150, 150));
+    window.dispatchEvent(pointerEvent("pointerup", 150, 150));
+
+    const clickHandler = vi.fn();
+    source.addEventListener("click", clickHandler);
+
+    const click = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+    });
+    source.dispatchEvent(click);
+
+    expect(clickHandler).not.toHaveBeenCalled();
+    expect(click.defaultPrevented).toBe(true);
+  });
+
+  it("does not suppress a plain click that never dragged", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
+    window.dispatchEvent(pointerEvent("pointerup", 6, 5));
+
+    const clickHandler = vi.fn();
+    source.addEventListener("click", clickHandler);
+    source.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(clickHandler).toHaveBeenCalledTimes(1);
+  });
+
   it("does not drop a source when a different pointer is released inside the target", () => {
     // Source's own drag never crosses the threshold — it should not be
     // considered "dragging" at all, let alone dropped by another pointer.
