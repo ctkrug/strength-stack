@@ -216,6 +216,52 @@ button {
   font-size: 0.8rem;
 }
 
+.material-row__remove {
+  cursor: pointer;
+}
+
+.material-row__remove circle {
+  fill: var(--color-surface-2);
+  stroke: var(--color-grid-line);
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    fill var(--transition-ui),
+    stroke var(--transition-ui),
+    transform 100ms var(--ease-out);
+}
+
+.material-row__remove text {
+  fill: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-anchor: middle;
+  pointer-events: none;
+  transition: fill var(--transition-ui);
+}
+
+.material-row__remove:hover circle {
+  fill: var(--color-danger);
+  stroke: var(--color-danger);
+}
+
+.material-row__remove:hover text {
+  fill: var(--color-text);
+}
+
+.material-row__remove:active circle {
+  transform: scale(0.92);
+}
+
+.material-row__remove:focus-visible {
+  outline: none;
+}
+
+.material-row__remove:focus-visible circle {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
