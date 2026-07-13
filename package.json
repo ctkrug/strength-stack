@@ -4,6 +4,9 @@
   "private": true,
   "description": "Drag materials onto a shared strength-per-weight chart and watch it redraw live.",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
