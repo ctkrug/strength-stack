@@ -132,6 +132,19 @@ describe("enableDragToPlace", () => {
     expect(ghost.style.transform).toBe("translate(20px, 20px)");
   });
 
+  it("cancels an in-progress drag when the window loses focus (alt-tab, OS dialog)", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
+    window.dispatchEvent(pointerEvent("pointermove", 150, 150));
+    expect(source.classList.contains("is-dragging")).toBe(true);
+    expect(document.querySelector(".drag-ghost")).not.toBeNull();
+
+    window.dispatchEvent(new Event("blur"));
+
+    expect(source.classList.contains("is-dragging")).toBe(false);
+    expect(document.querySelector(".drag-ghost")).toBeNull();
+    expect(onDrop).not.toHaveBeenCalled();
+  });
+
   it("suppresses the trailing synthetic click after a completed drag", () => {
     source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
     window.dispatchEvent(pointerEvent("pointermove", 150, 150));
