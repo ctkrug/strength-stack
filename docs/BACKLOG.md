@@ -139,7 +139,7 @@ up at every breakpoint named in `docs/DESIGN.md`.
 
 ## Epic 4 — Ship
 
-### [ ] 13. Deployable static build with share metadata
+### [x] 13. Deployable static build with share metadata
 The production build is a self-contained static bundle ready for
 `apps.charliekrug.com/strength-stack`, with metadata for link previews.
 
