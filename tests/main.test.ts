@@ -362,6 +362,18 @@ describe("main", () => {
     );
   });
 
+  it("does not throw when the status announcer element is missing", async () => {
+    await import("../src/main");
+    document.getElementById("status-announcer")?.remove();
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+
+    expect(() => button.click()).not.toThrow();
+    expect(document.querySelectorAll(".material-row")).toHaveLength(4);
+  });
+
   it("moves focus to another tray chip after a keyboard placement disables it", async () => {
     await import("../src/main");
 
