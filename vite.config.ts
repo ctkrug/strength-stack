@@ -5,6 +5,7 @@ export default defineConfig({
   // (e.g. apps.charliekrug.com/strength-stack).
   base: "./",
   build: {
-    outDir: "dist",
+    // The publisher serves this directory as the live site.
+    outDir: "site",
   },
 });
