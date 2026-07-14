@@ -562,4 +562,46 @@ describe("main", () => {
 
     expect(document.activeElement?.id).toBe("tray-title");
   });
+
+  it("keeps DOM node counts stable across many place/remove cycles (no leaks)", async () => {
+    await import("../src/main");
+
+    for (let cycle = 0; cycle < 5; cycle++) {
+      let unplaced = [
+        ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+      ].filter((b) => !b.disabled);
+      while (unplaced.length > 0) {
+        unplaced[0].click();
+        unplaced = [
+          ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+        ].filter((b) => !b.disabled);
+      }
+      expect(document.querySelectorAll(".material-row")).toHaveLength(12);
+
+      // Hover a bar each cycle so the lazily-created tooltip singleton gets
+      // exercised repeatedly too, not just placement/removal.
+      document
+        .querySelector(".material-row")!
+        .dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+
+      let removeControls = [
+        ...document.querySelectorAll<SVGGElement>("g.material-row__remove"),
+      ];
+      while (removeControls.length > 0) {
+        removeControls[0].dispatchEvent(
+          new MouseEvent("click", { bubbles: true }),
+        );
+        removeControls = [
+          ...document.querySelectorAll<SVGGElement>("g.material-row__remove"),
+        ];
+      }
+      expect(document.querySelectorAll(".material-row")).toHaveLength(0);
+    }
+
+    // A long session of churn shouldn't leave behind extra shared singletons
+    // (tooltip, chart svg) or an in-progress drag ghost.
+    expect(document.querySelectorAll(".material-tooltip")).toHaveLength(1);
+    expect(document.querySelectorAll(".strength-chart")).toHaveLength(1);
+    expect(document.querySelectorAll(".drag-ghost")).toHaveLength(0);
+  });
 });
