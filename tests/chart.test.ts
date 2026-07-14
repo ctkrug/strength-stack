@@ -66,7 +66,11 @@ describe("rankByStrength", () => {
     const bone = MATERIALS.find((m) => m.id === "bone")!;
 
     const ranked = rankByStrength([bone, steel, tiedTitanium]);
-    expect(ranked.map((m) => m.id)).toEqual(["steel", "titanium-ti6al4v", "bone"]);
+    expect(ranked.map((m) => m.id)).toEqual([
+      "steel",
+      "titanium-ti6al4v",
+      "bone",
+    ]);
   });
 
   it("moves the next-highest material to rank 1 after the current top is removed", () => {

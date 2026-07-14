@@ -69,8 +69,14 @@ describe("MaterialTooltip", () => {
   it("positions relative to the raw coordinates when the viewport reports zero size", () => {
     const originalWidth = window.innerWidth;
     const originalHeight = window.innerHeight;
-    Object.defineProperty(window, "innerWidth", { value: 0, configurable: true });
-    Object.defineProperty(window, "innerHeight", { value: 0, configurable: true });
+    Object.defineProperty(window, "innerWidth", {
+      value: 0,
+      configurable: true,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      value: 0,
+      configurable: true,
+    });
 
     try {
       const tooltip = new MaterialTooltip();
@@ -99,10 +105,20 @@ describe("MaterialTooltip", () => {
     const tooltip = new MaterialTooltip();
     tooltip.show(getMaterial("steel")!, 0, 0);
     const el = document.querySelector<HTMLElement>(".material-tooltip")!;
-    Object.defineProperty(el, "offsetWidth", { value: 200, configurable: true });
-    Object.defineProperty(el, "offsetHeight", { value: 100, configurable: true });
+    Object.defineProperty(el, "offsetWidth", {
+      value: 200,
+      configurable: true,
+    });
+    Object.defineProperty(el, "offsetHeight", {
+      value: 100,
+      configurable: true,
+    });
 
-    tooltip.show(getMaterial("steel")!, window.innerWidth - 5, window.innerHeight - 5);
+    tooltip.show(
+      getMaterial("steel")!,
+      window.innerWidth - 5,
+      window.innerHeight - 5,
+    );
 
     expect(el.style.left).toBe(`${window.innerWidth - 200 - 12}px`);
     expect(el.style.top).toBe(`${window.innerHeight - 100 - 12}px`);

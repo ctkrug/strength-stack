@@ -158,9 +158,7 @@ describe("enableDragToPlace", () => {
 
   it("ignores movement from an unrelated pointer during a drag (multi-touch)", () => {
     source.dispatchEvent(pointerEvent("pointerdown", 5, 5, { pointerId: 1 }));
-    window.dispatchEvent(
-      pointerEvent("pointermove", 20, 20, { pointerId: 1 }),
-    );
+    window.dispatchEvent(pointerEvent("pointermove", 20, 20, { pointerId: 1 }));
     expect(source.classList.contains("is-dragging")).toBe(true);
 
     // A second finger touches down elsewhere and moves — this must not
@@ -224,7 +222,9 @@ describe("enableDragToPlace", () => {
 
     // A second, unrelated pointer cancels — the in-progress drag on
     // pointerId 1 must survive untouched.
-    window.dispatchEvent(pointerEvent("pointercancel", 150, 150, { pointerId: 2 }));
+    window.dispatchEvent(
+      pointerEvent("pointercancel", 150, 150, { pointerId: 2 }),
+    );
 
     expect(source.classList.contains("is-dragging")).toBe(true);
     expect(document.querySelector(".drag-ghost")).not.toBeNull();
@@ -242,9 +242,7 @@ describe("enableDragToPlace", () => {
     window.dispatchEvent(
       pointerEvent("pointermove", 150, 150, { pointerId: 2 }),
     );
-    window.dispatchEvent(
-      pointerEvent("pointerup", 150, 150, { pointerId: 2 }),
-    );
+    window.dispatchEvent(pointerEvent("pointerup", 150, 150, { pointerId: 2 }));
 
     expect(onDrop).not.toHaveBeenCalled();
   });

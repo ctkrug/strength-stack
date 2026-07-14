@@ -6,7 +6,10 @@ import { getMaterial } from "../src/materials";
  * engine) — stub them per-element so the chart's responsive branches
  * (compact margin, height-driven row spacing) are actually exercised. */
 function stubSize(el: HTMLElement, width: number, height: number) {
-  Object.defineProperty(el, "clientWidth", { value: width, configurable: true });
+  Object.defineProperty(el, "clientWidth", {
+    value: width,
+    configurable: true,
+  });
   Object.defineProperty(el, "clientHeight", {
     value: height,
     configurable: true,
@@ -28,7 +31,10 @@ describe("StrengthChart responsive layout", () => {
   });
 
   function makeChart() {
-    return new StrengthChart(container, vi.fn(), { show: vi.fn(), hide: vi.fn() });
+    return new StrengthChart(container, vi.fn(), {
+      show: vi.fn(),
+      hide: vi.fn(),
+    });
   }
 
   it("uses the compact margin below the 480px breakpoint", () => {
@@ -36,9 +42,11 @@ describe("StrengthChart responsive layout", () => {
     const chart = makeChart();
     chart.render([getMaterial("steel")!], null);
 
-    expect(container.querySelector(".strength-chart__plot")?.getAttribute("transform")).toBe(
-      "translate(84,20)",
-    );
+    expect(
+      container
+        .querySelector(".strength-chart__plot")
+        ?.getAttribute("transform"),
+    ).toBe("translate(84,20)");
   });
 
   it("uses the default margin at and above the 480px breakpoint", () => {
@@ -46,9 +54,11 @@ describe("StrengthChart responsive layout", () => {
     const chart = makeChart();
     chart.render([getMaterial("steel")!], null);
 
-    expect(container.querySelector(".strength-chart__plot")?.getAttribute("transform")).toBe(
-      "translate(160,24)",
-    );
+    expect(
+      container
+        .querySelector(".strength-chart__plot")
+        ?.getAttribute("transform"),
+    ).toBe("translate(160,24)");
   });
 
   it("distributes a tall container's height across a short placed set instead of leaving a gap", () => {
@@ -63,7 +73,9 @@ describe("StrengthChart responsive layout", () => {
     // top/bottom of 24/32 and 2 rows in a 900px-tall container, the band
     // should be (900-24-32)/2 = 422px, well above the 56px minimum used
     // when no real container height is known.
-    const hits = [...container.querySelectorAll<SVGRectElement>("rect.material-row__hit")];
+    const hits = [
+      ...container.querySelectorAll<SVGRectElement>("rect.material-row__hit"),
+    ];
     expect(hits).toHaveLength(2);
     expect(Number(hits[0].getAttribute("height"))).toBeCloseTo(422, 0);
   });
@@ -73,7 +85,9 @@ describe("StrengthChart responsive layout", () => {
     const chart = makeChart();
     chart.render([getMaterial("steel")!, getMaterial("bone")!], null);
 
-    const hit = container.querySelector<SVGRectElement>("rect.material-row__hit")!;
+    const hit = container.querySelector<SVGRectElement>(
+      "rect.material-row__hit",
+    )!;
     expect(Number(hit.getAttribute("height"))).toBe(56);
   });
 
