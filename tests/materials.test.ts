@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
+import fc from "fast-check";
 import {
   CATEGORY_ORDER,
+  Material,
+  MaterialCategory,
   MATERIALS,
   categoryLabel,
   describeMaterial,
   getMaterial,
+  rankByStrength,
   specificStrength,
 } from "../src/materials";
 
@@ -75,5 +79,116 @@ describe("describeMaterial", () => {
         `${specificStrength(material).toFixed(0)} kN·m/kg`,
       );
     }
+  });
+});
+
+const categoryArb: fc.Arbitrary<MaterialCategory> = fc.constantFrom(
+  "natural",
+  "metal",
+  "synthetic-fiber",
+);
+
+const materialArb: fc.Arbitrary<Material> = fc.record({
+  id: fc.uuid(),
+  name: fc.string({ minLength: 1, maxLength: 40 }),
+  category: categoryArb,
+  tensileStrengthMPa: fc.double({
+    min: 0.001,
+    max: 10000,
+    noNaN: true,
+  }),
+  densityKgM3: fc.double({ min: 0.001, max: 20000, noNaN: true }),
+  fact: fc.string(),
+});
+
+/** Relative-error comparison — `toBeCloseTo`'s fixed decimal-digit tolerance
+ * breaks down at the scales these properties exercise (values spanning many
+ * orders of magnitude), where floating-point rounding alone exceeds a fixed
+ * absolute epsilon. */
+function expectRelativelyClose(actual: number, expected: number) {
+  expect(Math.abs(actual - expected) / Math.abs(expected)).toBeLessThan(1e-9);
+}
+
+describe("specificStrength (property-based)", () => {
+  it("is always positive for positive tensile strength and density", () => {
+    fc.assert(
+      fc.property(materialArb, (material) => {
+        expect(specificStrength(material)).toBeGreaterThan(0);
+      }),
+    );
+  });
+
+  it("scales linearly with tensile strength", () => {
+    fc.assert(
+      fc.property(
+        materialArb,
+        fc.double({ min: 0.1, max: 100, noNaN: true }),
+        (material, factor) => {
+          const scaled = {
+            ...material,
+            tensileStrengthMPa: material.tensileStrengthMPa * factor,
+          };
+          expectRelativelyClose(
+            specificStrength(scaled),
+            specificStrength(material) * factor,
+          );
+        },
+      ),
+    );
+  });
+
+  it("scales inversely with density", () => {
+    fc.assert(
+      fc.property(
+        materialArb,
+        fc.double({ min: 0.1, max: 100, noNaN: true }),
+        (material, factor) => {
+          const scaled = {
+            ...material,
+            densityKgM3: material.densityKgM3 * factor,
+          };
+          expectRelativelyClose(
+            specificStrength(scaled),
+            specificStrength(material) / factor,
+          );
+        },
+      ),
+    );
+  });
+});
+
+describe("rankByStrength (property-based)", () => {
+  it("returns a permutation of the input (same ids, same length)", () => {
+    fc.assert(
+      fc.property(fc.array(materialArb, { maxLength: 20 }), (materials) => {
+        const ranked = rankByStrength(materials);
+        expect(ranked).toHaveLength(materials.length);
+        expect(new Set(ranked.map((m) => m.id))).toEqual(
+          new Set(materials.map((m) => m.id)),
+        );
+      }),
+    );
+  });
+
+  it("always sorts descending by specific strength", () => {
+    fc.assert(
+      fc.property(fc.array(materialArb, { maxLength: 20 }), (materials) => {
+        const ranked = rankByStrength(materials);
+        for (let i = 1; i < ranked.length; i++) {
+          expect(specificStrength(ranked[i - 1])).toBeGreaterThanOrEqual(
+            specificStrength(ranked[i]),
+          );
+        }
+      }),
+    );
+  });
+
+  it("is idempotent — ranking an already-ranked list changes nothing", () => {
+    fc.assert(
+      fc.property(fc.array(materialArb, { maxLength: 20 }), (materials) => {
+        const ranked = rankByStrength(materials);
+        expect(rankByStrength(ranked)).toEqual(ranked);
+      }),
+    );
   });
 });
