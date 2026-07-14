@@ -41,6 +41,16 @@ describe("StrengthChart detail panel wiring", () => {
     expect(detail.show.mock.calls[0][2]).toBe(9);
   });
 
+  it("keeps showing material detail as the pointer moves across the row", () => {
+    const { detail, row } = renderSteel();
+    row.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: 12, clientY: 20 }),
+    );
+    expect(detail.show).toHaveBeenCalledTimes(1);
+    expect(detail.show.mock.calls[0][1]).toBe(12);
+    expect(detail.show.mock.calls[0][2]).toBe(20);
+  });
+
   it("hides material detail on mouseleave", () => {
     const { detail, row } = renderSteel();
     row.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
