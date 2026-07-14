@@ -60,7 +60,8 @@ comparable at a glance.
 - **TypeScript** for the app and data layer
 - **D3** for the chart rendering and transitions
 - **Vite** for bundling and local dev
-- **Vitest** for unit tests
+- **Vitest** for unit tests, with **fast-check** for property-based
+  tests of the specific-strength and ranking logic
 
 ## Development
 
