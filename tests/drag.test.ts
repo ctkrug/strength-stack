@@ -174,6 +174,24 @@ describe("enableDragToPlace", () => {
     expect(clickHandler).toHaveBeenCalledTimes(1);
   });
 
+  it("ignores a pointercancel from an unrelated pointer during a drag", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5, { pointerId: 1 }));
+    window.dispatchEvent(
+      pointerEvent("pointermove", 150, 150, { pointerId: 1 }),
+    );
+    expect(source.classList.contains("is-dragging")).toBe(true);
+
+    // A second, unrelated pointer cancels — the in-progress drag on
+    // pointerId 1 must survive untouched.
+    window.dispatchEvent(pointerEvent("pointercancel", 150, 150, { pointerId: 2 }));
+
+    expect(source.classList.contains("is-dragging")).toBe(true);
+    expect(document.querySelector(".drag-ghost")).not.toBeNull();
+
+    window.dispatchEvent(pointerEvent("pointerup", 150, 150, { pointerId: 1 }));
+    expect(onDrop).toHaveBeenCalledTimes(1);
+  });
+
   it("does not drop a source when a different pointer is released inside the target", () => {
     // Source's own drag never crosses the threshold — it should not be
     // considered "dragging" at all, let alone dropped by another pointer.
