@@ -190,6 +190,41 @@ describe("main", () => {
     expect(boneButton.disabled).toBe(false);
   });
 
+  it("dispatching a second click on an already-detached remove control is a safe no-op", async () => {
+    await import("../src/main");
+
+    const removeBone = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Bone from the chart"]',
+    )!;
+    // The bar re-render synchronously detaches this exact node from the
+    // DOM on the first click (D3's exit().remove()) — a second click
+    // dispatched on the now-detached node (e.g. a duplicate event from an
+    // overzealous input library) must not throw or remove anything else.
+    removeBone.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(() =>
+      removeBone.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+    ).not.toThrow();
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(2);
+  });
+
+  it("restores the chart's empty state after every default material is removed", async () => {
+    await import("../src/main");
+
+    for (const label of [
+      "Remove Steel (hardened) from the chart",
+      "Remove Bone from the chart",
+      "Remove Concrete from the chart",
+    ]) {
+      document
+        .querySelector<SVGGElement>(`[aria-label="${label}"]`)!
+        .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    }
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(0);
+    expect(document.querySelector(".strength-chart__empty")).not.toBeNull();
+  });
+
   it("removes a placed material via Enter on its remove control", async () => {
     await import("../src/main");
 
