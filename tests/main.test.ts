@@ -112,6 +112,27 @@ describe("main", () => {
     expect(document.querySelector(".material-row--celebrate")).toBeNull();
   });
 
+  it("does not double-place when the same tray button is clicked twice in quick succession", async () => {
+    await import("../src/main");
+
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+
+    // The first click's synchronous re-render disables (and detaches) this
+    // exact button — a native disabled <button> doesn't dispatch click on
+    // a second .click() call, so this exercises that browser guarantee
+    // directly rather than only the store-level idempotency it backstops.
+    button.click();
+    button.click();
+
+    const nylonRows = [...document.querySelectorAll(".material-row")].filter(
+      (row) =>
+        row.querySelector(".material-row__label")?.textContent === "Nylon",
+    );
+    expect(nylonRows).toHaveLength(1);
+  });
+
   it("places a material by dragging its tray chip onto the chart panel", async () => {
     await import("../src/main");
 
