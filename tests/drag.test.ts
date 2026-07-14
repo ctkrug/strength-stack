@@ -72,6 +72,33 @@ describe("enableDragToPlace", () => {
     expect(onDrop).not.toHaveBeenCalled();
   });
 
+  it("does not start a drag for a pointermove that stays under the threshold", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
+    window.dispatchEvent(pointerEvent("pointermove", 8, 6));
+
+    expect(source.classList.contains("is-dragging")).toBe(false);
+    expect(document.querySelector(".drag-ghost")).toBeNull();
+
+    // Close out the interaction so this test doesn't leak its window
+    // listeners (still live, since no threshold was ever crossed) into
+    // whichever test runs next.
+    window.dispatchEvent(pointerEvent("pointerup", 8, 6));
+  });
+
+  it("keeps tracking the same ghost across repeated moves once dragging", () => {
+    source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
+    window.dispatchEvent(pointerEvent("pointermove", 150, 150));
+    const ghost = document.querySelector(".drag-ghost");
+
+    window.dispatchEvent(pointerEvent("pointermove", 200, 220));
+
+    expect(document.querySelectorAll(".drag-ghost")).toHaveLength(1);
+    expect(document.querySelector(".drag-ghost")).toBe(ghost);
+    expect((ghost as HTMLElement).style.transform).toBe(
+      "translate(200px, 220px)",
+    );
+  });
+
   it("removes the ghost element and dragging class after drop", () => {
     source.dispatchEvent(pointerEvent("pointerdown", 5, 5));
     window.dispatchEvent(pointerEvent("pointermove", 150, 150));
