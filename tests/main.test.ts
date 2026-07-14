@@ -613,6 +613,45 @@ describe("main", () => {
     expect(renderSpy).toHaveBeenCalledTimes(1);
   });
 
+  it("survives a resize firing mid-drag and still completes the drop", async () => {
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 0, top: 0, right: 900, bottom: 900 });
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 400, clientY: 400 }),
+    );
+    expect(button.classList.contains("is-dragging")).toBe(true);
+
+    // A resize mid-drag (rotating a phone, an OS panel opening) coalesces
+    // into a chart re-render on its own timer — the in-progress drag must
+    // be unaffected by it.
+    window.dispatchEvent(new Event("resize"));
+    vi.runAllTimers();
+    expect(button.classList.contains("is-dragging")).toBe(true);
+    expect(document.querySelector(".drag-ghost")).not.toBeNull();
+
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 400, clientY: 400 }),
+    );
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(4);
+    expect(document.querySelector(".drag-ghost")).toBeNull();
+  });
+
   it("moves focus to the tray heading once every material is placed", async () => {
     await import("../src/main");
 
