@@ -53,6 +53,22 @@ describe("rankByStrength", () => {
     expect(ranked[0].id).toBe("snail-teeth");
   });
 
+  it("preserves original relative order for materials tied on specific strength", () => {
+    // Steel and titanium are both 950 MPa but at different densities in the
+    // real dataset, so this pins an exact tie synthetically — a naive
+    // unstable sort could jitter these two on repeated re-renders.
+    const [steel] = MATERIALS.filter((m) => m.id === "steel");
+    const tiedTitanium = {
+      ...MATERIALS.find((m) => m.id === "titanium-ti6al4v")!,
+      tensileStrengthMPa: steel.tensileStrengthMPa,
+      densityKgM3: steel.densityKgM3,
+    };
+    const bone = MATERIALS.find((m) => m.id === "bone")!;
+
+    const ranked = rankByStrength([bone, steel, tiedTitanium]);
+    expect(ranked.map((m) => m.id)).toEqual(["steel", "titanium-ti6al4v", "bone"]);
+  });
+
   it("moves the next-highest material to rank 1 after the current top is removed", () => {
     const ranked = rankByStrength(MATERIALS);
     const withoutTop = ranked.slice(1);
