@@ -435,6 +435,21 @@ describe("main", () => {
     expect(tooltip.hasAttribute("hidden")).toBe(true);
   });
 
+  it("keeps a tray chip's detail panel positioned as the pointer moves over it", async () => {
+    await import("../src/main");
+
+    const nylonButton = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Nylon")!;
+    nylonButton.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: 30, clientY: 40 }),
+    );
+
+    const tooltip = document.querySelector(".material-tooltip")!;
+    expect(tooltip.hasAttribute("hidden")).toBe(false);
+    expect(tooltip.textContent).toContain("Nylon");
+  });
+
   it("groups tray chips into category sections with headings", async () => {
     await import("../src/main");
 
