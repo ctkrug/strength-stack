@@ -52,6 +52,12 @@ describe("MaterialTooltip", () => {
     ).toBe(true);
   });
 
+  it("is a safe no-op to hide() before show() has ever been called", () => {
+    const tooltip = new MaterialTooltip();
+    expect(() => tooltip.hide()).not.toThrow();
+    expect(tooltip.isVisible()).toBe(false);
+  });
+
   it("does not throw when shown at the viewport edge", () => {
     const tooltip = new MaterialTooltip();
     expect(() => tooltip.show(getMaterial("steel")!, 0, 0)).not.toThrow();
