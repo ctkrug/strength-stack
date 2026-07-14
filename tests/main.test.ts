@@ -369,6 +369,41 @@ describe("main", () => {
     expect(playCelebrate).not.toHaveBeenCalled();
   });
 
+  it("does not play any SFX when a drag is dropped outside the chart panel", async () => {
+    const { SoundEngine } = await import("../src/sound");
+    const playPlace = vi.spyOn(SoundEngine.prototype, "playPlace");
+    const playRescale = vi.spyOn(SoundEngine.prototype, "playRescale");
+    const playCelebrate = vi.spyOn(SoundEngine.prototype, "playCelebrate");
+
+    await import("../src/main");
+
+    const chartPanel = document.querySelector<HTMLElement>(".chart-panel")!;
+    stubRect(chartPanel, { left: 500, top: 500, right: 900, bottom: 900 });
+    const button = [
+      ...document.querySelectorAll<HTMLButtonElement>(".tray__button"),
+    ].find((b) => b.textContent === "Snail Teeth")!;
+    stubRect(button, { left: 0, top: 0, right: 20, bottom: 20 });
+
+    button.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        clientX: 5,
+        clientY: 5,
+        button: 0,
+        bubbles: true,
+      }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { clientX: 10, clientY: 10 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { clientX: 10, clientY: 10 }),
+    );
+
+    expect(playPlace).not.toHaveBeenCalled();
+    expect(playRescale).not.toHaveBeenCalled();
+    expect(playCelebrate).not.toHaveBeenCalled();
+  });
+
   it("announces a placement in the status live region", async () => {
     await import("../src/main");
 
