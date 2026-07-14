@@ -83,7 +83,8 @@ organized, and [`docs/BACKLOG.md`](docs/BACKLOG.md) for what's left.
 ## CI gate
 
 Every push and pull request runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
-`npm run lint`, `npm test`, and `npm run build`, in that order. A red run on
+`npm run lint`, `npm run test:coverage` (fails if coverage drops below the
+thresholds in `vitest.config.ts`), and `npm run build`, in that order. A red run on
 `main` is a stop-the-line signal — fix forward before adding new work, don't
 build on top of a broken commit.
 
