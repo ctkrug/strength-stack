@@ -91,6 +91,23 @@ describe("MaterialTooltip", () => {
     }
   });
 
+  it("clamps away from the right/bottom edge accounting for its own rendered size", () => {
+    // jsdom always reports 0 for offsetWidth/offsetHeight, which degrades
+    // position()'s clamp to a no-op — stub real dimensions per instance so
+    // the "pull back so the tooltip's own box stays on-screen" math (not
+    // just the raw-coordinate clamp) is actually exercised.
+    const tooltip = new MaterialTooltip();
+    tooltip.show(getMaterial("steel")!, 0, 0);
+    const el = document.querySelector<HTMLElement>(".material-tooltip")!;
+    Object.defineProperty(el, "offsetWidth", { value: 200, configurable: true });
+    Object.defineProperty(el, "offsetHeight", { value: 100, configurable: true });
+
+    tooltip.show(getMaterial("steel")!, window.innerWidth - 5, window.innerHeight - 5);
+
+    expect(el.style.left).toBe(`${window.innerWidth - 200 - 12}px`);
+    expect(el.style.top).toBe(`${window.innerHeight - 100 - 12}px`);
+  });
+
   it("appends to a custom root element when provided", () => {
     const root = document.createElement("div");
     root.id = "custom-root";
