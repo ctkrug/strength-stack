@@ -106,6 +106,20 @@ describe("enableDragToPlace", () => {
     expect(onDrop).toHaveBeenCalledTimes(2);
   });
 
+  it("drops identically for a touch pointer as for a mouse pointer", () => {
+    source.dispatchEvent(
+      pointerEvent("pointerdown", 5, 5, { pointerType: "touch" }),
+    );
+    window.dispatchEvent(
+      pointerEvent("pointermove", 150, 150, { pointerType: "touch" }),
+    );
+    window.dispatchEvent(
+      pointerEvent("pointerup", 150, 150, { pointerType: "touch" }),
+    );
+
+    expect(onDrop).toHaveBeenCalledTimes(1);
+  });
+
   it("ignores non-primary pointer buttons", () => {
     source.dispatchEvent(pointerEvent("pointerdown", 5, 5, { button: 2 }));
     window.dispatchEvent(pointerEvent("pointermove", 150, 150));
