@@ -103,30 +103,49 @@ event, not from the store, so it never needs to trigger a re-render.
 ## Testing
 
 - `tests/materials.test.ts`, `tests/chart.test.ts` — pure logic
-  (`specificStrength`, `rankByStrength`), no DOM.
+  (`specificStrength`, `rankByStrength`), no DOM. `materials.test.ts`
+  also has a `fast-check` property-based block: arbitrary materials
+  check that `specificStrength` is always positive and scales
+  linearly/inversely with tensile strength/density, and that
+  `rankByStrength` always returns a same-length permutation, sorted
+  descending, and idempotent — invariants the fixed 12-material
+  dataset alone can't exercise across the range fast-check generates.
 - `tests/chart-labels.test.ts` — the label/value layout helpers in
   isolation, with `getComputedTextLength` stubbed per case.
+- `tests/chart-empty.test.ts` — the empty-placed-set message appears/
+  disappears correctly as materials are added/removed.
+- `tests/chart-responsive.test.ts` — the container-size-driven
+  branches (`computeMargin`'s compact/default breakpoint, height-driven
+  row band, the minimum-row-band fallback) with `clientWidth`/
+  `clientHeight` stubbed per case, plus that the `<svg>` element
+  persists identity across repeated renders (never torn down).
 - `tests/drag.test.ts` — `enableDragToPlace` against synthetic
-  `PointerEvent`s, independent of the rest of the app.
+  `PointerEvent`s, independent of the rest of the app: threshold
+  crossing, multi-pointer isolation, touch parity, and window-blur
+  cancellation.
 - `tests/state.test.ts` — `ChartStore` notification payloads.
 - `tests/sound.test.ts` — `SoundEngine` with a fake `AudioContext`
   (mute persistence, throttling, no-WebAudio safety).
 - `tests/tooltip.test.ts` — `MaterialTooltip` show/hide, DOM node reuse,
-  visibility, and viewport-edge safety.
+  visibility, and viewport-edge safety (including a zero-size viewport).
 - `tests/chart-detail.test.ts` — `StrengthChart`'s detail-panel wiring
   against a fake `DetailPanel`: hover/tap/focus/blur per row, and that
   clicking remove doesn't also bubble into the row's own handler.
 - `tests/main.test.ts` — end-to-end through the wired app (jsdom):
   drag-drop placement, remove control, the wow-moment celebration,
   SFX triggers, mute toggle, live-region/focus behavior, the tooltip on
-  bars and tray chips, and the category-grouped tray with its legend.
-  Uses fake timers because jsdom doesn't implement `SVGTransformList`,
-  which D3's transform transitions need — freezing the clock keeps the
-  animation frame that would hit that gap from ever firing.
+  bars and tray chips, the category-grouped tray with its legend, and
+  long-session place/remove churn (no leaked DOM nodes or duplicate
+  singletons). Uses fake timers because jsdom doesn't implement
+  `SVGTransformList`, which D3's transform transitions need — freezing
+  the clock keeps the animation frame that would hit that gap from
+  ever firing (this is also why row *position* after a re-sort isn't
+  asserted directly — `rankByStrength`'s property tests cover sort
+  correctness instead).
 
 Run everything: `npm test` (vitest, jsdom environment — see
-`vitest.config.ts`). Type-check: `npm run build` (`tsc -b && vite build`).
-Lint: `npm run lint`.
+`vitest.config.ts`). Coverage: `npm run test:coverage` (v8 provider).
+Type-check: `npm run build` (`tsc -b && vite build`). Lint: `npm run lint`.
 
 ## Build & deploy
 
