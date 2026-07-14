@@ -6,21 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Drag materials onto a shared strength-per-weight chart and watch it redraw live."
+      content="Drag spider silk, snail teeth, kevlar, bone, and steel onto one chart and watch it rank them by strength for their weight. No login, works on mobile."
     />
-    <title>Strength Stack</title>
+    <title>
+      Strength Stack | See which materials are strongest for their weight
+    </title>
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Strength Stack" />
+    <meta
+      property="og:title"
+      content="Strength Stack | See which materials are strongest for their weight"
+    />
     <meta
       property="og:description"
-      content="Drag spider silk, snail teeth, kevlar, bone, or steel onto a shared strength-per-weight chart and watch it rescale live."
+      content="Drag spider silk, snail teeth, kevlar, bone, and steel onto one chart and watch it rescale to rank them by strength for their weight."
     />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Strength Stack" />
     <meta
       name="twitter:description"
-      content="Drag spider silk, snail teeth, kevlar, bone, or steel onto a shared strength-per-weight chart and watch it rescale live."
+      content="Drag spider silk, snail teeth, kevlar, bone, and steel onto one chart and watch it rank them by strength for their weight."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,6 +37,81 @@
   </head>
   <body>
     <div id="app"></div>
+
+    <section class="page-section explainer" aria-labelledby="explainer-title">
+      <div class="page-section__inner">
+        <h2 id="explainer-title" class="page-section__title">
+          Strength for weight, on one scale
+        </h2>
+        <p>
+          Steel is strong. So is spider silk. But "strong" hides a second
+          question: strong for how much weight? Specific strength answers it by
+          dividing a material's tensile strength by its density, so a light
+          fiber and a dense metal finally sit on the same axis.
+        </p>
+        <p>
+          Strength Stack is a chart you build by hand. Drag a material from the
+          tray onto the plot and every bar rescales and re-sorts around it, so
+          you can watch steel shrink the moment carbon fiber lands above it.
+          Start from the three seeded materials, add the other nine in any
+          order, and remove any of them to compare a smaller set.
+        </p>
+      </div>
+    </section>
+
+    <section class="page-section faq" aria-labelledby="faq-title">
+      <div class="page-section__inner">
+        <h2 id="faq-title" class="page-section__title">Questions</h2>
+        <dl class="faq__list">
+          <dt>What is specific strength?</dt>
+          <dd>
+            Tensile strength divided by density, measured here in kN·m/kg. It
+            tells you how much load a material carries for its weight, which is
+            why engineers reach for it when weight is the constraint: aircraft,
+            bikes, prosthetics, rockets.
+          </dd>
+          <dt>Is spider silk really stronger than steel?</dt>
+          <dd>
+            For its weight, yes. Dragline spider silk lands well above hardened
+            steel on the specific-strength axis, because silk is far lighter for
+            the pulling force it survives. By raw force alone, steel still wins.
+          </dd>
+          <dt>What comes out on top?</dt>
+          <dd>
+            The synthetic fibers. Kevlar 49 and carbon fiber rank highest by
+            weight. Snail teeth (limpet radula) is the strongest natural
+            material by raw tensile strength, but it is dense enough that the
+            fibers still beat it once weight is accounted for.
+          </dd>
+          <dt>Where does the data come from?</dt>
+          <dd>
+            Typical, representative figures for each material class, drawn from
+            standard materials-science references. Real values shift with grade,
+            processing, and test method, so treat this as a tool for comparison,
+            not for engineering design.
+          </dd>
+          <dt>Do I need an account?</dt>
+          <dd>
+            No. Strength Stack runs entirely in your browser, works on a phone
+            with tap or drag, and stores nothing except whether you have muted
+            the sound.
+          </dd>
+        </dl>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <a
+        class="site-footer__cta"
+        href="https://github.com/ctkrug/strength-stack"
+      >
+        View the code on GitHub
+      </a>
+      <a class="site-footer__portfolio" href="https://apps.charliekrug.com">
+        More by Charlie Krug → apps.charliekrug.com
+      </a>
+    </footer>
+
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

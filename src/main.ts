@@ -19,19 +19,33 @@ function buildLayout(root: HTMLElement) {
         <span class="wordmark">Strength<span class="wordmark__accent">Stack</span></span>
         <p class="tagline">Real materials, one honest scale.</p>
       </div>
-      <button
-        type="button"
-        class="mute-toggle"
-        id="mute-toggle"
-        aria-pressed="false"
-        aria-label="Mute sound effects"
-      >
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-          <path class="mute-toggle__speaker" d="M4 9v6h4l5 5V4L8 9H4z" />
-          <path class="mute-toggle__wave" d="M16.2 8.8a5 5 0 0 1 0 6.4" />
-          <path class="mute-toggle__slash" d="M4 4l16 16" />
-        </svg>
-      </button>
+      <div class="site-header__actions">
+        <a
+          class="header-link"
+          href="https://github.com/ctkrug/strength-stack"
+          aria-label="View Strength Stack on GitHub"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path
+              fill="currentColor"
+              d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.53.1.72-.23.72-.5v-1.75c-2.92.63-3.54-1.4-3.54-1.4-.48-1.22-1.17-1.54-1.17-1.54-.95-.65.08-.64.08-.64 1.05.07 1.6 1.08 1.6 1.08.94 1.6 2.46 1.14 3.06.87.1-.68.37-1.14.66-1.4-2.33-.27-4.78-1.17-4.78-5.2 0-1.15.4-2.09 1.08-2.83-.1-.27-.47-1.34.1-2.8 0 0 .88-.28 2.88 1.08a9.9 9.9 0 0 1 5.24 0c2-.36 2.88-1.08 2.88-1.08.57 1.46.2 2.53.1 2.8.68.74 1.08 1.68 1.08 2.83 0 4.04-2.46 4.93-4.8 5.19.38.33.72.97.72 1.96v2.9c0 .28.19.61.73.5A10.5 10.5 0 0 0 12 1.5Z"
+            />
+          </svg>
+        </a>
+        <button
+          type="button"
+          class="mute-toggle"
+          id="mute-toggle"
+          aria-pressed="false"
+          aria-label="Mute sound effects"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path class="mute-toggle__speaker" d="M4 9v6h4l5 5V4L8 9H4z" />
+            <path class="mute-toggle__wave" d="M16.2 8.8a5 5 0 0 1 0 6.4" />
+            <path class="mute-toggle__slash" d="M4 4l16 16" />
+          </svg>
+        </button>
+      </div>
     </header>
     <main class="layout">
       <section class="chart-panel" aria-label="Specific strength chart">
