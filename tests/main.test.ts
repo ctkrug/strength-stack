@@ -32,6 +32,12 @@ describe("main", () => {
     vi.restoreAllMocks();
   });
 
+  it("does not throw when the #app root is missing from the page", async () => {
+    document.body.innerHTML = "";
+    await expect(import("../src/main")).resolves.not.toThrow();
+    expect(document.querySelectorAll(".material-row")).toHaveLength(0);
+  });
+
   it("renders the default demo materials on load", async () => {
     await import("../src/main");
     expect(document.querySelectorAll(".material-row")).toHaveLength(3);
