@@ -150,6 +150,7 @@ Type-check: `npm run build` (`tsc -b && vite build`). Lint: `npm run lint`.
 ## Build & deploy
 
 `vite.config.ts` sets `base: "./"` so the production build
-(`npm run build` → `dist/`) works from any subpath, e.g.
-`apps.charliekrug.com/strength-stack/`. No environment variables, no
-server-side rendering, no API calls at runtime.
+(`npm run build` → `site/`) works from any subpath, e.g.
+`apps.charliekrug.com/strength-stack/`. The publisher serves that
+`site/` directory. No environment variables, no server-side rendering,
+no API calls at runtime.
