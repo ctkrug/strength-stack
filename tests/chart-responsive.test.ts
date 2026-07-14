@@ -76,4 +76,18 @@ describe("StrengthChart responsive layout", () => {
     const hit = container.querySelector<SVGRectElement>("rect.material-row__hit")!;
     expect(Number(hit.getAttribute("height"))).toBe(56);
   });
+
+  it("keeps the same svg element across repeated renders (never tears down)", () => {
+    const chart = makeChart();
+    chart.render([getMaterial("steel")!], null);
+    const svg = container.querySelector("svg.strength-chart");
+
+    stubSize(container, 375, 400);
+    chart.render([getMaterial("steel")!, getMaterial("bone")!], "bone");
+    chart.render([], null);
+    chart.render([getMaterial("snail-teeth")!], "snail-teeth");
+
+    expect(container.querySelectorAll("svg.strength-chart")).toHaveLength(1);
+    expect(container.querySelector("svg.strength-chart")).toBe(svg);
+  });
 });
