@@ -238,6 +238,19 @@ describe("main", () => {
     expect(document.querySelectorAll(".material-row")).toHaveLength(2);
   });
 
+  it("removes a placed material via Space on its remove control", async () => {
+    await import("../src/main");
+
+    const removeSteel = document.querySelector<SVGGElement>(
+      '[aria-label="Remove Steel (hardened) from the chart"]',
+    )!;
+    removeSteel.dispatchEvent(
+      new KeyboardEvent("keydown", { key: " ", bubbles: true }),
+    );
+
+    expect(document.querySelectorAll(".material-row")).toHaveLength(2);
+  });
+
   it("ignores unrelated keys on the remove control", async () => {
     await import("../src/main");
 
