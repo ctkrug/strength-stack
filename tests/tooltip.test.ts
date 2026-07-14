@@ -66,6 +66,31 @@ describe("MaterialTooltip", () => {
     ).not.toThrow();
   });
 
+  it("positions relative to the raw coordinates when the viewport reports zero size", () => {
+    const originalWidth = window.innerWidth;
+    const originalHeight = window.innerHeight;
+    Object.defineProperty(window, "innerWidth", { value: 0, configurable: true });
+    Object.defineProperty(window, "innerHeight", { value: 0, configurable: true });
+
+    try {
+      const tooltip = new MaterialTooltip();
+      tooltip.show(getMaterial("steel")!, 50, 40);
+
+      const el = document.querySelector<HTMLElement>(".material-tooltip")!;
+      expect(el.style.left).toBe("62px");
+      expect(el.style.top).toBe("52px");
+    } finally {
+      Object.defineProperty(window, "innerWidth", {
+        value: originalWidth,
+        configurable: true,
+      });
+      Object.defineProperty(window, "innerHeight", {
+        value: originalHeight,
+        configurable: true,
+      });
+    }
+  });
+
   it("appends to a custom root element when provided", () => {
     const root = document.createElement("div");
     root.id = "custom-root";
